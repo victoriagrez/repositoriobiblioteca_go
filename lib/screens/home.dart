@@ -1,7 +1,14 @@
+// lib/screens/home.dart
+
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import '../models/libro.dart';
+import '../services/firebase_service.dart';
+import 'libro_detalle.dart';
+import 'buscar.dart';
+import 'listas.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,17 +19,106 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  final ServicioFirebase _servicioFirebase = ServicioFirebase();
+
+  // Lista de libros disponibles
+  final List<Libro> _librosNuevos = [
+    Libro(
+      id: 'libro_principito',
+      titulo: 'El Principito',
+      autor: 'Antoine de Saint-Exupéry',
+      imagenUrl: 'assets/principito.jpg',
+      calificacion: 5,
+      categorias: ['Arte', 'Infantil'],
+      paginas: 96,
+    ),
+    Libro(
+      id: 'libro_albatros',
+      titulo: 'El albatros negro',
+      autor: 'María Dueñas',
+      imagenUrl: 'assets/albatros.jpg',
+      calificacion: 5,
+      categorias: ['Historia', 'Novela'],
+      paginas: 450,
+    ),
+    Libro(
+      id: 'libro_zoo',
+      titulo: 'La muy catastrófica visita al zoo',
+      autor: 'Varios Autores',
+      imagenUrl: 'assets/zoo.jpg',
+      calificacion: 5,
+      categorias: ['Infantil', 'Humor'],
+      paginas: 120,
+    ),
+  ];
+
+  final List<Libro> _librosParaTi = [
+    Libro(
+      id: 'libro_amor',
+      titulo: 'Nuestra Desquiciada historia de amor',
+      autor: 'Sandy Nelson',
+      imagenUrl: 'assets/amor.jpg',
+      calificacion: 5,
+      categorias: ['Romance', 'Drama'],
+      paginas: 320,
+    ),
+    Libro(
+      id: 'libro_cosecha',
+      titulo: 'Amanecer en la cosecha',
+      autor: 'Autor Desconocido',
+      imagenUrl: 'assets/cosecha.jpg',
+      calificacion: 5,
+      categorias: ['Fantasía', 'Aventura'],
+      paginas: 280,
+    ),
+    Libro(
+      id: 'libro_aciman',
+      titulo: 'André Aciman',
+      autor: 'André Aciman',
+      imagenUrl: 'assets/aciman.jpg',
+      calificacion: 5,
+      categorias: ['Romance', 'Drama'],
+      paginas: 250,
+    ),
+  ];
 
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
     
-    // Aquí puedes navegar a otras pantallas según el índice
-    // Por ejemplo:
-    // if (index == 1) {
-    //   Navigator.push(context, MaterialPageRoute(builder: (context) => SearchScreen()));
-    // }
+    // Navegar según el índice
+    switch (index) {
+      case 0:
+        // Ya estamos en Home, no hacer nada
+        break;
+      case 1:
+        // Buscar
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const PaginaBuscar()),
+        );
+        break;
+      case 2:
+        // Libros / Lectura rápida
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Lectura rápida próximamente')),
+        );
+        break;
+      case 3:
+        // Listas (Favoritos)
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const PaginaListas()),
+        );
+        break;
+      case 4:
+        // Perfil
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Perfil próximamente')),
+        );
+        break;
+    }
   }
 
   Future<void> _signOut() async {
@@ -35,17 +131,32 @@ class _HomeScreenState extends State<HomeScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Sesión cerrada exitosamente')),
       );
-      
-      // Cuando tengas LoginScreen, descomenta esto:
-      // Navigator.pushReplacement(
-      //   context,
-      //   MaterialPageRoute(builder: (_) => const LoginScreen()),
-      // );
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al cerrar sesión: $e')),
       );
+    }
+  }
+
+  // Función para agregar/quitar de favoritos desde el home
+  Future<void> _alternarFavorito(Libro libro) async {
+    final exitoso = await _servicioFirebase.alternarFavorito(libro);
+    
+    if (!mounted) return;
+    
+    if (exitoso) {
+      final esFav = await _servicioFirebase.esFavorito(libro.id);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            esFav ? '❤️ Agregado a favoritos' : '💔 Eliminado de favoritos',
+          ),
+          duration: const Duration(seconds: 2),
+          backgroundColor: esFav ? Colors.green : Colors.red,
+        ),
+      );
+      setState(() {}); // Refrescar UI
     }
   }
 
@@ -75,7 +186,10 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.search, color: Colors.white),
             onPressed: () {
-              // Navegar a pantalla de búsqueda
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PaginaBuscar()),
+              );
             },
           ),
           IconButton(
@@ -111,26 +225,13 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 16),
             SizedBox(
               height: 280,
-              child: ListView(
+              child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: [
-                  _buildBookCard(
-                    'El Principito',
-                    'assets/principito.jpg',
-                    5,
-                  ),
-                  _buildBookCard(
-                    'El albatros negro',
-                    'assets/albatros.jpg',
-                    5,
-                  ),
-                  _buildBookCard(
-                    'La muy catastrófica visita al zoo',
-                    'assets/zoo.jpg',
-                    5,
-                  ),
-                ],
+                itemCount: _librosNuevos.length,
+                itemBuilder: (context, index) {
+                  return _buildBookCard(_librosNuevos[index]);
+                },
               ),
             ),
             const SizedBox(height: 30),
@@ -140,26 +241,13 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 16),
             SizedBox(
               height: 280,
-              child: ListView(
+              child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                children: [
-                  _buildBookCard(
-                    'Nuestra Desquiciada historia de amor',
-                    'assets/amor.jpg',
-                    5,
-                  ),
-                  _buildBookCard(
-                    'Amanecer en la cosecha',
-                    'assets/cosecha.jpg',
-                    5,
-                  ),
-                  _buildBookCard(
-                    'André Aciman',
-                    'assets/aciman.jpg',
-                    5,
-                  ),
-                ],
+                itemCount: _librosParaTi.length,
+                itemBuilder: (context, index) {
+                  return _buildBookCard(_librosParaTi[index]);
+                },
               ),
             ),
             const SizedBox(height: 20),
@@ -246,9 +334,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.chevron_left, color: Colors.black),
-                  onPressed: () {
-                    // Acción para navegar al mes anterior
-                  },
+                  onPressed: () {},
                 ),
                 const SizedBox(width: 10),
                 const Column(
@@ -325,9 +411,7 @@ class _HomeScreenState extends State<HomeScreen> {
             bottom: 0,
             child: IconButton(
               icon: const Icon(Icons.chevron_right, color: Colors.black),
-              onPressed: () {
-                // Acción para navegar al mes siguiente
-              },
+              onPressed: () {},
             ),
           ),
         ],
@@ -335,7 +419,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildBookCard(String title, String imagePath, int rating) {
+  Widget _buildBookCard(Libro libro) {
     return Container(
       width: 160,
       margin: const EdgeInsets.only(right: 16),
@@ -344,56 +428,83 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Stack(
             children: [
-              Container(
-                height: 200,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+              // Imagen del libro clickeable
+              GestureDetector(
+                onTap: () {
+                  // Navegar a la pantalla de detalle del libro
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PaginaDetalleLibro(libro: libro),
                     ),
-                  ],
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(
-                    imagePath,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: Colors.grey[300],
-                        child: const Center(
-                          child: Icon(Icons.book, size: 50, color: Colors.grey),
-                        ),
-                      );
-                    },
+                  ).then((_) {
+                    // Refrescar cuando volvemos
+                    setState(() {});
+                  });
+                },
+                child: Container(
+                  height: 200,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.2),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.asset(
+                      libro.imagenUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[300],
+                          child: const Center(
+                            child: Icon(Icons.book, size: 50, color: Colors.grey),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
+              // Botón de favorito
               Positioned(
                 top: 8,
                 right: 8,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Icon(
-                    Icons.bookmark_border,
-                    color: Color(0xFF28A9B8),
-                    size: 24,
-                  ),
+                child: FutureBuilder<bool>(
+                  future: _servicioFirebase.esFavorito(libro.id),
+                  builder: (context, snapshot) {
+                    final esFavorito = snapshot.data ?? false;
+                    return GestureDetector(
+                      onTap: () => _alternarFavorito(libro),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Icon(
+                          esFavorito ? Icons.bookmark : Icons.bookmark_border,
+                          color: esFavorito
+                              ? const Color(0xFFE85D2E)
+                              : const Color(0xFF28A9B8),
+                          size: 24,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
           ),
           const SizedBox(height: 8),
           Text(
-            title,
+            libro.titulo,
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -404,7 +515,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 4),
           Row(
             children: List.generate(
-              rating,
+              libro.calificacion.toInt(),
               (index) => const Icon(
                 Icons.star,
                 color: Color(0xFFFFA726),
