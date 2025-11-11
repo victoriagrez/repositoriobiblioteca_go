@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../theme/theme.dart';
 
 class PaginaMetas extends StatefulWidget {
   const PaginaMetas({super.key});
@@ -15,129 +16,138 @@ class _PaginaMetasState extends State<PaginaMetas> {
 
     await showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Nueva Meta de Lectura'),
-        content: TextField(
-          controller: controlador,
-          decoration: const InputDecoration(
-            labelText: 'Escribe tu meta',
-            border: OutlineInputBorder(),
-          ),
-          maxLines: 2,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE85D2E),
-              foregroundColor: Colors.white,
+      builder: (context) {
+        final scheme = Theme.of(context).colorScheme;
+        return AlertDialog(
+          title: const Text('Nueva Meta de Lectura'),
+          content: TextField(
+            controller: controlador,
+            decoration: const InputDecoration(
+              labelText: 'Escribe tu meta',
+              border: OutlineInputBorder(),
             ),
-            onPressed: () async {
-              final texto = controlador.text.trim();
-              if (texto.isNotEmpty) {
-                await FirebaseFirestore.instance
-                    .collection('metas_lectura')
-                    .add({
-                  'metas': [texto],
-                  'fecha': FieldValue.serverTimestamp(),
-                  'completado': false,
-                });
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Meta agregada correctamente'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-              }
-            },
-            child: const Text('Guardar'),
+            maxLines: 2,
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: scheme.primary,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () async {
+                final texto = controlador.text.trim();
+                if (texto.isNotEmpty) {
+                  await FirebaseFirestore.instance
+                      .collection('metas_lectura')
+                      .add({
+                    'metas': [texto],
+                    'fecha': FieldValue.serverTimestamp(),
+                    'completado': false,
+                  });
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Meta agregada correctamente'),
+                      backgroundColor: scheme.secondary,
+                    ),
+                  );
+                }
+              },
+              child: const Text('Guardar'),
+            ),
+          ],
+        );
+      },
     );
   }
 
-  // CRUD (EDITAR) :0
+  // CRUD (EDITAR)
   void _editarMeta(String docId, List<dynamic> metasActuales) async {
     final controlador = TextEditingController(text: metasActuales.join('\n'));
 
     await showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Editar Metas'),
-        content: TextField(
-          controller: controlador,
-          decoration: const InputDecoration(
-            labelText: 'Edita tus metas',
-            border: OutlineInputBorder(),
-            hintText: 'Escribe cada meta en una línea',
-          ),
-          maxLines: 5,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE85D2E),
-              foregroundColor: Colors.white,
+      builder: (context) {
+        final scheme = Theme.of(context).colorScheme;
+        return AlertDialog(
+          title: const Text('Editar Metas'),
+          content: TextField(
+            controller: controlador,
+            decoration: const InputDecoration(
+              labelText: 'Edita tus metas',
+              border: OutlineInputBorder(),
+              hintText: 'Escribe cada meta en una línea',
             ),
-            onPressed: () async {
-              final texto = controlador.text.trim();
-              if (texto.isNotEmpty) {
-                final nuevasMetas = texto.split('\n')
-                    .where((linea) => linea.trim().isNotEmpty)
-                    .toList();
-                    
-                await FirebaseFirestore.instance
-                    .collection('metas_lectura')
-                    .doc(docId)
-                    .update({'metas': nuevasMetas});
-                    
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Metas actualizadas'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
-              }
-            },
-            child: const Text('Guardar'),
+            maxLines: 5,
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: scheme.primary,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () async {
+                final texto = controlador.text.trim();
+                if (texto.isNotEmpty) {
+                  final nuevasMetas = texto
+                      .split('\n')
+                      .where((linea) => linea.trim().isNotEmpty)
+                      .toList();
+
+                  await FirebaseFirestore.instance
+                      .collection('metas_lectura')
+                      .doc(docId)
+                      .update({'metas': nuevasMetas});
+
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Metas actualizadas'),
+                      backgroundColor: scheme.secondary,
+                    ),
+                  );
+                }
+              },
+              child: const Text('Guardar'),
+            ),
+          ],
+        );
+      },
     );
   }
 
-// CRUD 1 (ELIMINAR) :(
   void _eliminarMeta(String docId) async {
     final confirmar = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Eliminar Meta'),
-        content: const Text('¿Estás seguro de eliminar esta meta?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+      builder: (context) {
+        final scheme = Theme.of(context).colorScheme;
+        return AlertDialog(
+          title: const Text('Eliminar Meta'),
+          content: const Text('¿Estás seguro de eliminar esta meta?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar'),
             ),
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Eliminar'),
-          ),
-        ],
-      ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: scheme.error,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Eliminar'),
+            ),
+          ],
+        );
+      },
     );
 
     if (confirmar == true) {
@@ -145,11 +155,11 @@ class _PaginaMetasState extends State<PaginaMetas> {
           .collection('metas_lectura')
           .doc(docId)
           .delete();
-          
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Meta eliminada'),
-          backgroundColor: Colors.red,
+        SnackBar(
+          content: const Text('Meta eliminada'),
+          backgroundColor: Theme.of(context).colorScheme.error,
         ),
       );
     }
@@ -161,23 +171,26 @@ class _PaginaMetasState extends State<PaginaMetas> {
         .collection('metas_lectura')
         .doc(docId)
         .update({'completado': !completadoActual});
-        
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           completadoActual ? 'Meta marcada como pendiente' : 'Meta completada ✓',
         ),
-        backgroundColor: completadoActual ? Colors.orange : Colors.green,
+        backgroundColor:
+            completadoActual ? Colors.orange : Theme.of(context).colorScheme.secondary,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F0),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFE85D2E),
+        backgroundColor: scheme.primary,
         title: const Row(
           children: [
             Icon(Icons.flag, color: Colors.white),
@@ -196,19 +209,18 @@ class _PaginaMetasState extends State<PaginaMetas> {
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: Color(0xFFE85D2E)),
+            return Center(
+              child: CircularProgressIndicator(color: scheme.primary),
             );
           }
 
-//ERROR?...
+
           if (snapshot.hasError) {
             return Center(
               child: Text('Error: ${snapshot.error}'),
             );
           }
 
-//SI NO HAY META...
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
             return Center(
               child: Column(
@@ -260,8 +272,9 @@ class _PaginaMetasState extends State<PaginaMetas> {
                         children: [
                           Checkbox(
                             value: completado,
-                            onChanged: (_) => _marcarCompletada(doc.id, completado),
-                            activeColor: const Color(0xFFE85D2E),
+                            onChanged: (_) =>
+                                _marcarCompletada(doc.id, completado),
+                            activeColor: scheme.primary,
                           ),
                           Expanded(
                             child: Text(
@@ -269,7 +282,7 @@ class _PaginaMetasState extends State<PaginaMetas> {
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: completado ? Colors.green : Colors.orange,
+                                color: completado ? scheme.secondary : Colors.orange,
                               ),
                             ),
                           ),
@@ -299,25 +312,25 @@ class _PaginaMetasState extends State<PaginaMetas> {
                       const SizedBox(height: 8),
                       //LISTA
                       ...metas.map((meta) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Icon(
-                              Icons.check_circle,
-                              color: Color(0xFF28A9B8),
-                              size: 20,
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Icon(
+                                  Icons.check_circle,
+                                  color: AppTheme.azulSecundario,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    meta,
+                                    style: const TextStyle(fontSize: 15),
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                meta,
-                                style: const TextStyle(fontSize: 15),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )),
+                          )),
                     ],
                   ),
                 ),
@@ -327,7 +340,7 @@ class _PaginaMetasState extends State<PaginaMetas> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFFE85D2E),
+        backgroundColor: scheme.primary,
         onPressed: _agregarMeta,
         child: const Icon(Icons.add, color: Colors.white),
       ),

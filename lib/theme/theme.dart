@@ -1,46 +1,101 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  //CLARO
+  static const Color naranjaPrimario = Color(0xFFEB5F28); 
+  static const Color azulSecundario = Color(0xFF28A9B8);
+  static const Color fondoClaro = Color(0xFFF5F5F0);      
+  static const Color naranjaOscuro = Color(0xFFAC3306);   
+  static const Color amarilloEstrella = Color(0xFFFFA726); 
+
   static ThemeData lightTheme = FlexThemeData.light(
-    scheme: FlexScheme.blueM3,
+    colors: const FlexSchemeColor(
+      primary: naranjaPrimario,
+      primaryContainer: naranjaPrimario,
+      secondary: azulSecundario,
+      secondaryContainer: azulSecundario,
+      tertiary: naranjaOscuro,
+      tertiaryContainer: naranjaOscuro,
+      appBarColor: naranjaPrimario,
+      error: Color(0xFFB00020),
+    ),
+    surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+    blendLevel: 0,
     subThemesData: const FlexSubThemesData(
-      interactionEffects: true,
-      tintedDisabledControls: true,
-      useMaterial3Typography: true,
+      blendOnLevel: 0,
+      blendOnColors: false,
+      useTextTheme: true,
       useM2StyleDividerInM3: true,
-      inputDecoratorIsFilled: true,
-      inputDecoratorBorderType: FlexInputBorderType.outline,
-      alignedDropdown: true,
-      navigationRailUseIndicator: true,
+      defaultRadius: 8.0,
+    ),
+    keyColors: const FlexKeyColors(
+      useKeyColors: false,
+      useSecondary: false,
+      useTertiary: false,
     ),
     visualDensity: FlexColorScheme.comfortablePlatformDensity,
     useMaterial3: true,
-    cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
-    fontFamily: GoogleFonts.notoSans().fontFamily,
+    scaffoldBackground: fondoClaro,
+  ).copyWith(
+    appBarTheme: const AppBarTheme(
+      backgroundColor: naranjaPrimario,
+      foregroundColor: Colors.white,
+      elevation: 0,
+      centerTitle: false,
+      iconTheme: IconThemeData(color: Colors.white),
+      actionsIconTheme: IconThemeData(color: Colors.white),
+      surfaceTintColor: Colors.transparent, 
+      scrolledUnderElevation: 0,           
+    ),
+    colorScheme: const ColorScheme.light(
+      primary: naranjaPrimario,
+      secondary: azulSecundario,
+      surfaceTint: Colors.transparent,
+    ),
   );
 
-  //OSCURO
   static ThemeData darkTheme = FlexThemeData.dark(
-    scheme: FlexScheme.blueM3,
+    colors: const FlexSchemeColor(
+      primary: naranjaPrimario,
+      primaryContainer: naranjaPrimario,
+      secondary: azulSecundario,
+      secondaryContainer: azulSecundario,
+      tertiary: naranjaOscuro,
+      tertiaryContainer: naranjaOscuro,
+      appBarColor: naranjaPrimario,
+      error: Color(0xFFCF6679),
+    ),
+    surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
+    blendLevel: 0,
     subThemesData: const FlexSubThemesData(
-      interactionEffects: true,
-      tintedDisabledControls: true,
-      blendOnColors: true,
-      useMaterial3Typography: true,
+      blendOnLevel: 0,
+      blendOnColors: false,
+      useTextTheme: true,
       useM2StyleDividerInM3: true,
-      inputDecoratorIsFilled: true,
-      inputDecoratorBorderType: FlexInputBorderType.outline,
-      alignedDropdown: true,
-      navigationRailUseIndicator: true,
+      defaultRadius: 8.0,
+    ),
+    keyColors: const FlexKeyColors(
+      useKeyColors: false,
+      useSecondary: false,
+      useTertiary: false,
     ),
     visualDensity: FlexColorScheme.comfortablePlatformDensity,
     useMaterial3: true,
-    cupertinoOverrideTheme: const CupertinoThemeData(applyThemeToAll: true),
-    fontFamily: GoogleFonts.notoSans().fontFamily,
+  ).copyWith(
+    appBarTheme: const AppBarTheme(
+      backgroundColor: naranjaPrimario,
+      foregroundColor: Colors.white,
+      elevation: 0,
+      centerTitle: false,
+      iconTheme: IconThemeData(color: Colors.white),
+      actionsIconTheme: IconThemeData(color: Colors.white),
+      surfaceTintColor: Colors.transparent,
+      scrolledUnderElevation: 0,
+    ),
+    colorScheme: const ColorScheme.dark(
+      primary: naranjaPrimario,
+      secondary: azulSecundario,
+      surfaceTint: Colors.transparent,
+    ),
   );
 }
-

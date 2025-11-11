@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'home.dart';
+import '../theme/theme.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -77,8 +78,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -86,7 +89,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
             children: [
               const SizedBox(height: 40),
               
-            // TIT
               const Text(
                 '¿Cuáles son tus\nmetas?',
                 textAlign: TextAlign.center,
@@ -100,7 +102,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
               
               const SizedBox(height: 16),
               
-            // SUB
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20.0),
                 child: Text(
@@ -116,16 +117,14 @@ class _OnboardingPageState extends State<OnboardingPage> {
               
               const SizedBox(height: 40),
               
-            //ICONO DE ESTRELLA : RATING
               const Icon(
                 Icons.star,
-                color: Color(0xFFFFA726),
+                color: AppTheme.amarilloEstrella,
                 size: 32,
               ),
               
               const SizedBox(height: 32),
               
-            //OPCIONES
               Expanded(
                 child: ListView.builder(
                   itemCount: _metas.length,
@@ -151,7 +150,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 child: ElevatedButton(
                   onPressed: _guardando ? null : _guardarMetas,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE85D2E),
+                    backgroundColor: scheme.primary,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(28),
@@ -186,17 +185,19 @@ class _OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-//BOTON META
+//BOTON 
   Widget _construirBotonMeta(String titulo, bool seleccionada, VoidCallback onTap) {
+    final scheme = Theme.of(context).colorScheme;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(28),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
         decoration: BoxDecoration(
-          color: seleccionada ? const Color(0xFFFFE8DC) : Colors.white,
+          color: seleccionada ? scheme.primary.withOpacity(0.12) : Colors.white,
           border: Border.all(
-            color: seleccionada ? const Color(0xFFE85D2E) : const Color(0xFFE0E0E0),
+            color: seleccionada ? scheme.primary : const Color(0xFFE0E0E0),
             width: seleccionada ? 2 : 1.5,
           ),
           borderRadius: BorderRadius.circular(28),
@@ -207,7 +208,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w400,
-            color: seleccionada ? const Color(0xFFE85D2E) : const Color(0xFFD4A89A),
+            color: seleccionada ? scheme.primary : Colors.grey[500],
             letterSpacing: 0.3,
           ),
         ),

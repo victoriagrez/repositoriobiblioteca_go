@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../theme/theme.dart';
 
 class PaginaDetalleLibro extends StatefulWidget {
   final String libroId;
@@ -19,7 +20,6 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
   bool _esFavorito = false;
   bool _cargando = false;
 
-  //CARD
   static const double _bookWidth = 160;
   static const double _bookHeight = 200;
   static const double _bookRadius = 8;
@@ -65,10 +65,10 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
         });
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Eliminado de favoritos'),
-              duration: Duration(seconds: 2),
-              backgroundColor: Colors.red,
+            SnackBar(
+              content: const Text('Eliminado de favoritos'),
+              duration: const Duration(seconds: 2),
+              backgroundColor: Theme.of(context).colorScheme.error,
             ),
           );
         }
@@ -92,10 +92,10 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
         });
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Agregado a favoritos'),
-              duration: Duration(seconds: 2),
-              backgroundColor: Colors.green,
+            SnackBar(
+              content: const Text('Agregado a favoritos'),
+              duration: const Duration(seconds: 2),
+              backgroundColor: Theme.of(context).colorScheme.secondary,
             ),
           );
         }
@@ -106,7 +106,7 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
       }
@@ -122,10 +122,12 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
     final categorias = List<String>.from(widget.datosLibro['categorias'] ?? []);
     final paginas = widget.datosLibro['paginas'] ?? 0;
 
+    final scheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F0),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFEB5F28),
+        backgroundColor: scheme.primary,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
@@ -147,13 +149,13 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
                   ),
             onPressed: _cargando ? null : _manejarFavorito,
           ),
-          IconButton(
-            icon: const Icon(Icons.share, color: Colors.white),
-            onPressed: () {},
+          const IconButton(
+            icon: Icon(Icons.share, color: Colors.white),
+            onPressed: null,
           ),
-          IconButton(
-            icon: const Icon(Icons.flag_outlined, color: Colors.white),
-            onPressed: () {},
+          const IconButton(
+            icon: Icon(Icons.flag_outlined, color: Colors.white),
+            onPressed: null,
           ),
         ],
       ),
@@ -221,7 +223,7 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
               children: List.generate(5, (index) {
                 return Icon(
                   index < calificacion ? Icons.star : Icons.star_border,
-                  color: Colors.amber,
+                  color: AppTheme.amarilloEstrella,
                   size: 24,
                 );
               }),
@@ -238,7 +240,7 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
                 children: categorias.map((categoria) {
                   return Chip(
                     label: Text(categoria),
-                    backgroundColor: const Color(0xFF00A2C6),
+                    backgroundColor: AppTheme.azulSecundario,
                     labelStyle: const TextStyle(color: Colors.white),
                   );
                 }).toList(),
@@ -253,7 +255,7 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
               icon: const Icon(Icons.play_circle_outline),
               label: const Text('Leer Libro'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFAC3306),
+                backgroundColor: AppTheme.naranjaOscuro,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 40,
@@ -272,11 +274,11 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
               length: 3,
               child: Column(
                 children: [
-                  const TabBar(
-                    labelColor: Color(0xFFEB5F28),
+                  TabBar(
+                    labelColor: scheme.primary,
                     unselectedLabelColor: Colors.grey,
-                    indicatorColor: Color(0xFFEB5F28),
-                    tabs: [
+                    indicatorColor: scheme.primary,
+                    tabs: const [
                       Tab(text: 'LIBRO'),
                       Tab(text: 'REVIEW'),
                       Tab(text: 'ESTADÍSTICAS'),
@@ -320,7 +322,7 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFF00A2C6),
+              color: AppTheme.azulSecundario,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(

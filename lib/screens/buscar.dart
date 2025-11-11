@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/theme.dart';
 
 class PaginaBuscar extends StatefulWidget {
   const PaginaBuscar({Key? key}) : super(key: key);
@@ -6,7 +7,7 @@ class PaginaBuscar extends StatefulWidget {
   @override
   State<PaginaBuscar> createState() => _PaginaBuscarState();
 }
-
+//BUSCAR
 class _PaginaBuscarState extends State<PaginaBuscar> {
   final TextEditingController _controladorBusqueda = TextEditingController();
   String _textoBusqueda = '';
@@ -19,14 +20,16 @@ class _PaginaBuscarState extends State<PaginaBuscar> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F0),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFEB5F28),
         title: const Text(
           'Buscar Libros',
           style: TextStyle(color: Colors.white),
         ),
+        backgroundColor: scheme.primary,
       ),
       body: Column(
         children: [
@@ -40,6 +43,7 @@ class _PaginaBuscarState extends State<PaginaBuscar> {
                   _textoBusqueda = valor;
                 });
               },
+              cursorColor: AppTheme.azulSecundario,
               decoration: InputDecoration(
                 hintText: 'Buscar libros, autores...',
                 filled: true,
@@ -48,6 +52,7 @@ class _PaginaBuscarState extends State<PaginaBuscar> {
                 suffixIcon: _textoBusqueda.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear),
+                        color: AppTheme.azulSecundario,
                         onPressed: () {
                           setState(() {
                             _controladorBusqueda.clear();
@@ -60,10 +65,14 @@ class _PaginaBuscarState extends State<PaginaBuscar> {
                   borderRadius: BorderRadius.circular(30),
                   borderSide: BorderSide.none,
                 ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(color: AppTheme.azulSecundario, width: 2),
+                ),
               ),
             ),
           ),
-        //RESULTA2
+      //RESULTADOS
           Expanded(
             child: _textoBusqueda.isEmpty
                 ? Center(

@@ -17,7 +17,6 @@ class ServicioFirebase {
     }
   }
 
-  //READ
   Stream<List<Libro>> obtenerFavoritos() {
     return _favoritos.snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
@@ -29,7 +28,6 @@ class ServicioFirebase {
     });
   }
 
-  //VERIFICAR FAV
   Future<bool> esFavorito(String libroId) async {
     try {
       final doc = await _favoritos.doc(libroId).get();
@@ -40,7 +38,6 @@ class ServicioFirebase {
     }
   }
 
-  //ACTUALIZAR FAVS
   Future<bool> actualizarFavorito(Libro libro) async {
     try {
       await _favoritos.doc(libro.id).update(libro.aFirebase());
@@ -52,7 +49,6 @@ class ServicioFirebase {
     }
   }
 
-  //ELIMINAR FAVS
   Future<bool> eliminarDeFavoritos(String libroId) async {
     try {
       await _favoritos.doc(libroId).delete();
@@ -64,7 +60,6 @@ class ServicioFirebase {
     }
   }
 
-  //+ O -
   Future<bool> alternarFavorito(Libro libro) async {
     final yaEsFavorito = await esFavorito(libro.id);
     

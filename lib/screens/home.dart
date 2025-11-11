@@ -1,3 +1,4 @@
+// lib/screens/home.dart
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,6 +9,7 @@ import '../services/firebase_service.dart';
 import 'libro_detalle.dart';
 import 'buscar.dart';
 import 'listas.dart';
+import '../theme/theme.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -151,7 +153,9 @@ class _HomeScreenState extends State<HomeScreen> {
             esFav ? 'Agregado a favoritos' : 'Eliminado de favoritos',
           ),
           duration: const Duration(seconds: 2),
-          backgroundColor: esFav ? Colors.green : Colors.red,
+          backgroundColor: esFav
+              ? AppTheme.azulSecundario
+              : Theme.of(context).colorScheme.error,
         ),
       );
       setState(() {});
@@ -160,16 +164,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    final secondary = AppTheme.azulSecundario;
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFFE85D2E),
+        backgroundColor: primary,
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Container(
-            decoration: const BoxDecoration(
-              color: Color(0xFF28A9B8),
-              shape: BoxShape.circle,
-            ),
+          child: CircleAvatar(
+            backgroundColor: secondary,
+            foregroundColor: Colors.white,
+            child: const Icon(Icons.person, size: 20),
           ),
         ),
         title: const Text(
@@ -213,13 +219,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 viewportFraction: 0.9,
               ),
               items: [
-                _buildRetoLectorCard(),
+                _buildRetoLectorCard(secondary),
               ],
             ),
             const SizedBox(height: 30),
 
         //LANZAMIENTOS
-            _buildSectionHeader('Nuevos\nlanzamientos'),
+            _buildSectionHeader('Nuevos\nlanzamientos', primary),
             const SizedBox(height: 16),
             SizedBox(
               height: 280,
@@ -228,14 +234,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 itemCount: _librosNuevos.length,
                 itemBuilder: (context, index) {
-                  return _buildBookCard(_librosNuevos[index]);
+                  return _buildBookCard(_librosNuevos[index], secondary);
                 },
               ),
             ),
             const SizedBox(height: 30),
 
         //PARA TI
-            _buildSectionHeader('Para ti'),
+            _buildSectionHeader('Para ti', primary),
             const SizedBox(height: 16),
             SizedBox(
               height: 280,
@@ -244,7 +250,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 itemCount: _librosParaTi.length,
                 itemBuilder: (context, index) {
-                  return _buildBookCard(_librosParaTi[index]);
+                  return _buildBookCard(_librosParaTi[index], secondary);
                 },
               ),
             ),
@@ -256,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFFE85D2E),
+        selectedItemColor: primary,
         unselectedItemColor: Colors.grey,
         items: const [
           BottomNavigationBarItem(
@@ -284,7 +290,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(String title, Color primary) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Row(
@@ -300,12 +306,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           TextButton(
             onPressed: () {
-          //VER MAS :D
+          //VER MAS 
             },
-            child: const Text(
+            child: Text(
               'Ver más',
               style: TextStyle(
-                color: Color(0xFFE85D2E),
+                color: primary,
                 fontSize: 16,
               ),
             ),
@@ -315,11 +321,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildRetoLectorCard() {
+  Widget _buildRetoLectorCard(Color secondary) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 5),
       decoration: BoxDecoration(
-        color: const Color(0xFF28A9B8),
+        color: secondary,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Stack(
@@ -331,7 +337,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Row(
               children: [
                 IconButton(
-                  icon: const Icon(Icons.chevron_left, color: Colors.black),
+                  icon: const Icon(Icons.chevron_left, color: Colors.white),
                   onPressed: () {},
                 ),
                 const SizedBox(width: 10),
@@ -342,7 +348,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(
                       'Reto Lector',
                       style: TextStyle(
-                        color: Colors.black,
+                        color: Colors.white,
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                       ),
@@ -350,7 +356,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(
                       '2025',
                       style: TextStyle(
-                        color: Colors.black,
+                        color: Colors.white,
                         fontSize: 16,
                       ),
                     ),
@@ -408,7 +414,7 @@ class _HomeScreenState extends State<HomeScreen> {
             top: 0,
             bottom: 0,
             child: IconButton(
-              icon: const Icon(Icons.chevron_right, color: Colors.black),
+              icon: const Icon(Icons.chevron_right, color: Colors.white),
               onPressed: () {},
             ),
           ),
@@ -417,7 +423,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildBookCard(Libro libro) {
+  Widget _buildBookCard(Libro libro, Color secondary) {
     return Container(
       width: 160,
       margin: const EdgeInsets.only(right: 16),
@@ -492,14 +498,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(4),
+                          color: Colors.white.withOpacity(0.85),
+                          borderRadius: BorderRadius.circular(6),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.15),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: Icon(
                           esFavorito ? Icons.bookmark : Icons.bookmark_border,
-                          color: esFavorito
-                              ? const Color(0xFFE85D2E)
-                              : const Color(0xFF28A9B8),
+                          color: secondary,
                           size: 24,
                         ),
                       ),
@@ -525,7 +536,7 @@ class _HomeScreenState extends State<HomeScreen> {
               libro.calificacion.toInt(),
               (index) => const Icon(
                 Icons.star,
-                color: Color(0xFFFFA726),
+                color: AppTheme.amarilloEstrella,
                 size: 16,
               ),
             ),

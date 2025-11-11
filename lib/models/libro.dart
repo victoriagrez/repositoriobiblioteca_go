@@ -1,5 +1,4 @@
-// lib/models/libro.dart
-
+// CLASE LIBRO PARA REUTILIZAR
 class Libro {
   String id;
   String titulo;
@@ -21,7 +20,7 @@ class Libro {
     this.esFavorito = false,
   });
 
-  // Convertir de Firebase a Libro
+  //FIREBASE LIBRO
   factory Libro.desdeFirebase(Map<String, dynamic> datos, String id) {
     return Libro(
       id: id,
@@ -35,7 +34,7 @@ class Libro {
     );
   }
 
-  // Convertir de Libro a Map para Firebase
+  //MAP
   Map<String, dynamic> aFirebase() {
     return {
       'titulo': titulo,
@@ -48,7 +47,7 @@ class Libro {
     };
   }
 
-  // Crear copia del libro con cambios
+  //COPIA
   Libro copiarCon({
     String? id,
     String? titulo,

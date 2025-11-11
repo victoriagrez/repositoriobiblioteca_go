@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'libro_detalle.dart';
+import '../theme/theme.dart';
 
 class PaginaListas extends StatefulWidget {
   const PaginaListas({super.key});
@@ -33,7 +34,7 @@ class _PaginaListasState extends State<PaginaListas> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
             child: const Text('Eliminar'),
           ),
         ],
@@ -49,9 +50,9 @@ class _PaginaListasState extends State<PaginaListas> {
             
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Eliminado de favoritos'),
-              backgroundColor: Colors.green,
+            SnackBar(
+              content: const Text('Eliminado de favoritos'),
+              backgroundColor: Theme.of(context).colorScheme.secondary,
             ),
           );
         }
@@ -60,7 +61,7 @@ class _PaginaListasState extends State<PaginaListas> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Error al eliminar: $e'),
-              backgroundColor: Colors.red,
+              backgroundColor: Theme.of(context).colorScheme.error,
             ),
           );
         }
@@ -70,10 +71,12 @@ class _PaginaListasState extends State<PaginaListas> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F0),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFEB5F28),
+        backgroundColor: scheme.primary,
         title: const Row(
           children: [
             Icon(Icons.bookmark, color: Colors.white),
@@ -103,6 +106,7 @@ class _PaginaListasState extends State<PaginaListas> {
                   _textoBusqueda = valor;
                 });
               },
+              cursorColor: AppTheme.azulSecundario,
               decoration: InputDecoration(
                 hintText: 'Buscar',
                 filled: true,
@@ -111,6 +115,7 @@ class _PaginaListasState extends State<PaginaListas> {
                 suffixIcon: _textoBusqueda.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear),
+                        color: AppTheme.azulSecundario,
                         onPressed: () {
                           setState(() {
                             _controladorBusqueda.clear();
@@ -122,6 +127,10 @@ class _PaginaListasState extends State<PaginaListas> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
                   borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(color: AppTheme.azulSecundario, width: 2),
                 ),
               ),
             ),
@@ -135,9 +144,9 @@ class _PaginaListasState extends State<PaginaListas> {
               builder: (context, snapshot) {
                 // Mientras carga
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
+                  return Center(
                     child: CircularProgressIndicator(
-                      color: Color(0xFFEB5F28),
+                      color: scheme.primary,
                     ),
                   );
                 }
@@ -148,16 +157,16 @@ class _PaginaListasState extends State<PaginaListas> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.error_outline,
                           size: 60,
-                          color: Colors.red,
+                          color: scheme.error,
                         ),
                         const SizedBox(height: 16),
-                        Text(
+                        const Text(
                           'Error al cargar favoritos',
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: Colors.grey),
+                          style: TextStyle(color: Colors.grey),
                         ),
                       ],
                     ),
@@ -335,7 +344,7 @@ class _PaginaListasState extends State<PaginaListas> {
                           index < calificacion
                               ? Icons.star
                               : Icons.star_border,
-                          color: Colors.amber,
+                          color: AppTheme.amarilloEstrella,
                           size: 16,
                         );
                       }),
@@ -347,7 +356,7 @@ class _PaginaListasState extends State<PaginaListas> {
                       child: LinearProgressIndicator(
                         value: 0.68,
                         backgroundColor: Colors.grey[300],
-                        color: const Color(0xFF00A2C6),
+                        color: AppTheme.azulSecundario,
                         minHeight: 8,
                       ),
                     ),
@@ -364,7 +373,7 @@ class _PaginaListasState extends State<PaginaListas> {
               ),
               //ELIMINAR (BOTON) 
               IconButton(
-                icon: const Icon(Icons.delete_outline, color: Colors.red),
+                icon: Icon(Icons.delete_outline, color: Theme.of(context).colorScheme.error),
                 onPressed: () => _eliminarDeFavoritos(docId),
               ),
             ],
