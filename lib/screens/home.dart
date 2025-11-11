@@ -1,4 +1,3 @@
-// lib/screens/home.dart
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,7 +21,10 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   final ServicioFirebase _servicioFirebase = ServicioFirebase();
 
-  //LIBROS DISPO 
+  static const double _coverWidth = 160;
+  static const double _coverHeight = 200;
+
+  // LIBROS DISPO 
   final List<Libro> _librosNuevos = [
     Libro(
       id: 'libro_principito',
@@ -46,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
       id: 'libro_zoo',
       titulo: 'La muy catastrófica visita al zoo',
       autor: 'Varios Autores',
-      imagenUrl: 'assets/zoo.jpg',
+      imagenUrl: 'assets/zoo.webp',
       calificacion: 5,
       categorias: ['Infantil', 'Humor'],
       paginas: 120,
@@ -58,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
       id: 'libro_amor',
       titulo: 'Nuestra Desquiciada historia de amor',
       autor: 'Sandy Nelson',
-      imagenUrl: 'assets/amor.jpg',
+      imagenUrl: 'assets/desquiciada.webp',
       calificacion: 5,
       categorias: ['Romance', 'Drama'],
       paginas: 320,
@@ -67,7 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
       id: 'libro_cosecha',
       titulo: 'Amanecer en la cosecha',
       autor: 'Autor Desconocido',
-      imagenUrl: 'assets/cosecha.jpg',
+      imagenUrl: 'assets/amanecer.jpg',
       calificacion: 5,
       categorias: ['Fantasía', 'Aventura'],
       paginas: 280,
@@ -76,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
       id: 'libro_aciman',
       titulo: 'André Aciman',
       autor: 'André Aciman',
-      imagenUrl: 'assets/aciman.jpg',
+      imagenUrl: 'assets/romano.jpg',
       calificacion: 5,
       categorias: ['Romance', 'Drama'],
       paginas: 250,
@@ -88,32 +90,32 @@ class _HomeScreenState extends State<HomeScreen> {
       _selectedIndex = index;
     });
 
-    //NAV
+    // NAV
     switch (index) {
       case 0:
         break;
       case 1:
-    // BUSCAR
+        // BUSCAR
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const PaginaBuscar()),
         );
         break;
       case 2:
-    //LIBROS LECTURA RAP 
+        // LIBROS LECTURA RAP 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Lectura rápida')),
         );
         break;
       case 3:
-    //LISTAS FAV
+        // LISTAS FAV
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const PaginaListas()),
         );
         break;
       case 4:
-    //PERFIL
+        // PERFIL
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Perfil')),
         );
@@ -139,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  //AGREGAR Y ELIMINAR FAVS 
+  // AGREGAR Y ELIMINAR FAVS 
   Future<void> _alternarFavorito(Libro libro) async {
     final exitoso = await _servicioFirebase.alternarFavorito(libro);
 
@@ -209,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             const SizedBox(height: 20),
 
-        //RETO LECTOR 
+            // RETO LECTOR 
             CarouselSlider(
               options: CarouselOptions(
                 height: 200,
@@ -224,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 30),
 
-        //LANZAMIENTOS
+            // LANZAMIENTOS
             _buildSectionHeader('Nuevos\nlanzamientos', primary),
             const SizedBox(height: 16),
             SizedBox(
@@ -240,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 30),
 
-        //PARA TI
+            // PARA TI
             _buildSectionHeader('Para ti', primary),
             const SizedBox(height: 16),
             SizedBox(
@@ -306,7 +308,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           TextButton(
             onPressed: () {
-          //VER MAS 
+              // VER MAS 
             },
             child: Text(
               'Ver más',
@@ -322,120 +324,107 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildRetoLectorCard(Color secondary) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 5),
-      decoration: BoxDecoration(
-        color: secondary,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            left: 20,
-            top: 0,
-            bottom: 0,
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.chevron_left, color: Colors.white),
-                  onPressed: () {},
-                ),
-                const SizedBox(width: 10),
-                const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Reto Lector',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
+  return Container(
+    margin: const EdgeInsets.symmetric(horizontal: 5),
+    decoration: BoxDecoration(
+      color: secondary,
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: Stack(
+      children: [
+        // Flechas izquierda
+        Positioned(
+          left: 10,
+          top: 0,
+          bottom: 0,
+          child: IconButton(
+            icon: const Icon(Icons.chevron_left, color: Colors.white),
+            onPressed: () {},
+          ),
+        ),
+
+        // CONTENIDO CENTRADO (con ajuste anti-overflow)
+        // FittedBox escalará el contenido si no cabe en 200 px de alto
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Reto lector 2025',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
                     ),
-                    Text(
-                      '2025',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                      ),
+                  ),
+                  const Text(
+                    'Biblioteca Pública Digital',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                  const SizedBox(height: 8),
+                  Icon(
+                    Icons.keyboard,
+                    size: 44, // antes 50
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Mayo',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 30, // antes 32
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const Text(
+                    'Un libro de creación',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  'Reto lector 2025',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Text(
-                  'Biblioteca Pública Digital',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Icon(
-                  Icons.keyboard,
-                  size: 50,
-                  color: Colors.white.withOpacity(0.9),
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Mayo',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const Text(
-                  'Un libro de creación',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
+        ),
+
+        // Flechas derecha
+        Positioned(
+          right: 10,
+          top: 0,
+          bottom: 0,
+          child: IconButton(
+            icon: const Icon(Icons.chevron_right, color: Colors.white),
+            onPressed: () {},
           ),
-          Positioned(
-            right: 20,
-            top: 0,
-            bottom: 0,
-            child: IconButton(
-              icon: const Icon(Icons.chevron_right, color: Colors.white),
-              onPressed: () {},
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
+
 
   Widget _buildBookCard(Libro libro, Color secondary) {
     return Container(
-      width: 160,
-      margin: const EdgeInsets.only(right: 16),
+      width: _coverWidth,
+      margin: const EdgeInsets.only(right: 16), 
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Stack(
             children: [
-              //IMAGEN LIBRO 
+              // IMAGEN LIBRO 
               GestureDetector(
                 onTap: () {
-                  //NAVEGACION PANTALLA DE LIBRO DETALLE
+                  // NAVEGACION PANTALLA DE LIBRO DETALLE
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -456,7 +445,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   });
                 },
                 child: Container(
-                  height: 200,
+                  height: _coverHeight, // 200
                   decoration: BoxDecoration(
                     color: Colors.grey[300],
                     borderRadius: BorderRadius.circular(8),
@@ -470,22 +459,30 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
-                    child: Image.asset(
-                      libro.imagenUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey[300],
-                          child: const Center(
-                            child: Icon(Icons.book, size: 50, color: Colors.grey),
-                          ),
-                        );
-                      },
+                    child: Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      color: Colors.grey[200],
+                      child: Image.asset(
+                        libro.imagenUrl,
+                        fit: BoxFit.cover,        
+                        width: double.infinity,
+                        height: double.infinity,  
+                        alignment: Alignment.center,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            color: Colors.grey[300],
+                            child: const Center(
+                              child: Icon(Icons.book, size: 50, color: Colors.grey),
+                            ),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),
               ),
-              //FAV BOTON
+              // FAV BOTON
               Positioned(
                 top: 8,
                 right: 8,
@@ -520,24 +517,30 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+
+      
+          const SizedBox(height: 6), 
           Text(
             libro.titulo,
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 13,           
+              height: 1.1,            
               fontWeight: FontWeight.w500,
             ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
+
           const SizedBox(height: 4),
+
+          // ESTRELLAS (ligeramente más pequeñas)
           Row(
             children: List.generate(
               libro.calificacion.toInt(),
               (index) => const Icon(
                 Icons.star,
                 color: AppTheme.amarilloEstrella,
-                size: 16,
+                size: 14, 
               ),
             ),
           ),
