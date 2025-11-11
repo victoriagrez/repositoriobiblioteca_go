@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final ServicioFirebase _servicioFirebase = ServicioFirebase();
 
   static const double _coverWidth = 160;
-  static const double _coverHeight = 200;
+  static const double _coverHeight = 220;
 
   // LIBROS DISPO 
   final List<Libro> _librosNuevos = [
@@ -39,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
       id: 'libro_albatros',
       titulo: 'El albatros negro',
       autor: 'María Dueñas',
-      imagenUrl: 'assets/albatros.jpg',
+      imagenUrl: 'assets/albatroz.png',
       calificacion: 5,
       categorias: ['Historia', 'Novela'],
       paginas: 450,
