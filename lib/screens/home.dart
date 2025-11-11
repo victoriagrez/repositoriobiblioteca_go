@@ -1,9 +1,8 @@
-// lib/screens/home.dart
-
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
 import '../models/libro.dart';
 import '../services/firebase_service.dart';
 import 'libro_detalle.dart';
@@ -21,7 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   final ServicioFirebase _servicioFirebase = ServicioFirebase();
 
-  // Lista de libros disponibles
+  //LIBROS DISPO 
   final List<Libro> _librosNuevos = [
     Libro(
       id: 'libro_principito',
@@ -86,36 +85,35 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _selectedIndex = index;
     });
-    
-    // Navegar según el índice
+
+    //NAV
     switch (index) {
       case 0:
-        // Ya estamos en Home, no hacer nada
         break;
       case 1:
-        // Buscar
+    // BUSCAR
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const PaginaBuscar()),
         );
         break;
       case 2:
-        // Libros / Lectura rápida
+    //LIBROS LECTURA RAP 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Lectura rápida próximamente')),
+          const SnackBar(content: Text('Lectura rápida')),
         );
         break;
       case 3:
-        // Listas (Favoritos)
+    //LISTAS FAV
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const PaginaListas()),
         );
         break;
       case 4:
-        // Perfil
+    //PERFIL
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Perfil próximamente')),
+          const SnackBar(content: Text('Perfil')),
         );
         break;
     }
@@ -125,9 +123,9 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       await GoogleSignIn.instance.signOut();
       await FirebaseAuth.instance.signOut();
-      
+
       if (!mounted) return;
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Sesión cerrada exitosamente')),
       );
@@ -139,24 +137,24 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // Función para agregar/quitar de favoritos desde el home
+  //AGREGAR Y ELIMINAR FAVS 
   Future<void> _alternarFavorito(Libro libro) async {
     final exitoso = await _servicioFirebase.alternarFavorito(libro);
-    
+
     if (!mounted) return;
-    
+
     if (exitoso) {
       final esFav = await _servicioFirebase.esFavorito(libro.id);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            esFav ? '❤️ Agregado a favoritos' : '💔 Eliminado de favoritos',
+            esFav ? 'Agregado a favoritos' : 'Eliminado de favoritos',
           ),
           duration: const Duration(seconds: 2),
           backgroundColor: esFav ? Colors.green : Colors.red,
         ),
       );
-      setState(() {}); // Refrescar UI
+      setState(() {});
     }
   }
 
@@ -204,8 +202,8 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
-            
-            // Carrusel del Reto Lector
+
+        //RETO LECTOR 
             CarouselSlider(
               options: CarouselOptions(
                 height: 200,
@@ -220,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 30),
 
-            // Sección "Nuevos lanzamientos"
+        //LANZAMIENTOS
             _buildSectionHeader('Nuevos\nlanzamientos'),
             const SizedBox(height: 16),
             SizedBox(
@@ -236,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 30),
 
-            // Sección "Para ti"
+        //PARA TI
             _buildSectionHeader('Para ti'),
             const SizedBox(height: 16),
             SizedBox(
@@ -302,7 +300,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           TextButton(
             onPressed: () {
-              // Navegar a ver más
+          //VER MAS :D
             },
             child: const Text(
               'Ver más',
@@ -384,7 +382,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Icon(
                   Icons.keyboard,
                   size: 50,
-                  color: Colors.white.withValues(alpha: 0.9),
+                  color: Colors.white.withOpacity(0.9),
                 ),
                 const SizedBox(height: 10),
                 const Text(
@@ -428,17 +426,26 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Stack(
             children: [
-              // Imagen del libro clickeable
+              //IMAGEN LIBRO 
               GestureDetector(
                 onTap: () {
-                  // Navegar a la pantalla de detalle del libro
+                  //NAVEGACION PANTALLA DE LIBRO DETALLE
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => PaginaDetalleLibro(libro: libro),
+                      builder: (context) => PaginaDetalleLibro(
+                        libroId: libro.id,
+                        datosLibro: {
+                          'titulo': libro.titulo,
+                          'autor': libro.autor,
+                          'imagenUrl': libro.imagenUrl,
+                          'calificacion': libro.calificacion,
+                          'categorias': libro.categorias,
+                          'paginas': libro.paginas,
+                        },
+                      ),
                     ),
                   ).then((_) {
-                    // Refrescar cuando volvemos
                     setState(() {});
                   });
                 },
@@ -449,7 +456,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(8),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2),
+                        color: Colors.black.withOpacity(0.2),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
@@ -472,7 +479,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              // Botón de favorito
+              //FAV BOTON
               Positioned(
                 top: 8,
                 right: 8,
@@ -485,7 +492,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.5),
+                          color: Colors.black.withOpacity(0.5),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Icon(

@@ -1,21 +1,16 @@
-// lib/screens/listas.dart
-
 import 'package:flutter/material.dart';
-import '../models/libro.dart';
-import '../services/firebase_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'libro_detalle.dart';
 
 class PaginaListas extends StatefulWidget {
-  const PaginaListas({Key? key}) : super(key: key);
+  const PaginaListas({super.key});
 
   @override
   State<PaginaListas> createState() => _PaginaListasState();
 }
 
 class _PaginaListasState extends State<PaginaListas> {
-  final ServicioFirebase _servicioFirebase = ServicioFirebase();
   final TextEditingController _controladorBusqueda = TextEditingController();
-  List<Libro> _librosFiltrados = [];
   String _textoBusqueda = '';
 
   @override
@@ -24,17 +19,52 @@ class _PaginaListasState extends State<PaginaListas> {
     super.dispose();
   }
 
-  void _filtrarLibros(List<Libro> todosLosLibros) {
-    if (_textoBusqueda.isEmpty) {
-      _librosFiltrados = todosLosLibros;
-    } else {
-      _librosFiltrados = todosLosLibros.where((libro) {
-        final tituloMin = libro.titulo.toLowerCase();
-        final autorMin = libro.autor.toLowerCase();
-        final busquedaMin = _textoBusqueda.toLowerCase();
-        return tituloMin.contains(busquedaMin) ||
-            autorMin.contains(busquedaMin);
-      }).toList();
+  // CRUD: ELIMINAR DE FAVS
+  Future<void> _eliminarDeFavoritos(String libroId) async {
+    final resultado = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Eliminar de favoritos'),
+        content: const Text('¿Estás segura que quieres eliminar este libro de tus favoritos?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
+
+    if (resultado == true) {
+      try {
+        await FirebaseFirestore.instance
+            .collection('mis_favoritos')
+            .doc(libroId)
+            .delete();
+            
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Eliminado de favoritos'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error al eliminar: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
     }
   }
 
@@ -57,15 +87,13 @@ class _PaginaListasState extends State<PaginaListas> {
         actions: [
           IconButton(
             icon: const Icon(Icons.search, color: Colors.white),
-            onPressed: () {
-              // Ya tenemos búsqueda abajo
-            },
+            onPressed: () {},
           ),
         ],
       ),
       body: Column(
         children: [
-          // Barra de búsqueda
+          //SEARCHBAR
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
@@ -98,10 +126,12 @@ class _PaginaListasState extends State<PaginaListas> {
               ),
             ),
           ),
-          // Lista de libros favoritos
+          // CRUD LISTA FAVORITOS :)
           Expanded(
-            child: StreamBuilder<List<Libro>>(
-              stream: _servicioFirebase.obtenerFavoritos(),
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('mis_favoritos')
+                  .snapshots(),
               builder: (context, snapshot) {
                 // Mientras carga
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -112,7 +142,7 @@ class _PaginaListasState extends State<PaginaListas> {
                   );
                 }
 
-                // Si hay error
+                //ERROR?
                 if (snapshot.hasError) {
                   return Center(
                     child: Column(
@@ -125,7 +155,7 @@ class _PaginaListasState extends State<PaginaListas> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Error al cargar favoritos\n${snapshot.error}',
+                          'Error al cargar favoritos',
                           textAlign: TextAlign.center,
                           style: const TextStyle(color: Colors.grey),
                         ),
@@ -134,8 +164,8 @@ class _PaginaListasState extends State<PaginaListas> {
                   );
                 }
 
-                // Si no hay libros
-                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                //NO LIBROS? 
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -168,11 +198,16 @@ class _PaginaListasState extends State<PaginaListas> {
                   );
                 }
 
-                // Filtrar libros según búsqueda
-                final libros = snapshot.data!;
-                _filtrarLibros(libros);
+                //AGREGAR FILTRO 
+                final docs = snapshot.data!.docs.where((doc) {
+                  final data = doc.data() as Map<String, dynamic>;
+                  final titulo = (data['titulo'] ?? '').toString().toLowerCase();
+                  final autor = (data['autor'] ?? '').toString().toLowerCase();
+                  final busqueda = _textoBusqueda.toLowerCase();
+                  return titulo.contains(busqueda) || autor.contains(busqueda);
+                }).toList();
 
-                if (_librosFiltrados.isEmpty && _textoBusqueda.isNotEmpty) {
+                if (docs.isEmpty && _textoBusqueda.isNotEmpty) {
                   return Center(
                     child: Text(
                       'No se encontraron libros con "$_textoBusqueda"',
@@ -184,34 +219,23 @@ class _PaginaListasState extends State<PaginaListas> {
                   );
                 }
 
-                // Mostrar libros
+                //LIBROS
                 return ListView(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   children: [
-                    // Sección: Leyendo
-                    _construirSeccion(
-                      titulo: 'Leyendo',
-                      libros: _librosFiltrados
-                          .where((l) => l.categorias.contains('Leyendo'))
-                          .toList(),
-                      colorProgreso: const Color(0xFF00A2C6),
+                    //GUARDADOS
+                    const Text(
+                      'Guardados',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    const SizedBox(height: 20),
-                    // Sección: Leídos
-                    _construirSeccion(
-                      titulo: 'Leídos',
-                      libros: _librosFiltrados
-                          .where((l) => l.categorias.contains('Leído'))
-                          .toList(),
-                      colorProgreso: const Color(0xFF00A2C6),
-                    ),
-                    const SizedBox(height: 20),
-                    // Sección: Guardados (todos los demás)
-                    _construirSeccion(
-                      titulo: 'Guardados',
-                      libros: _librosFiltrados,
-                      colorProgreso: Colors.pink,
-                    ),
+                    const SizedBox(height: 12),
+                    ...docs.map((doc) {
+                      final data = doc.data() as Map<String, dynamic>;
+                      return _construirTarjetaLibro(doc.id, data);
+                    }),
                   ],
                 );
               },
@@ -222,30 +246,12 @@ class _PaginaListasState extends State<PaginaListas> {
     );
   }
 
-  Widget _construirSeccion({
-    required String titulo,
-    required List<Libro> libros,
-    required Color colorProgreso,
-  }) {
-    if (libros.isEmpty) return const SizedBox.shrink();
+  Widget _construirTarjetaLibro(String docId, Map<String, dynamic> data) {
+    final titulo = data['titulo'] ?? 'Sin título';
+    final autor = data['autor'] ?? 'Autor desconocido';
+    final imagenUrl = data['imagenUrl'] ?? '';
+    final calificacion = (data['calificacion'] ?? 0).toInt();
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          titulo,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 12),
-        ...libros.map((libro) => _construirTarjetaLibro(libro, colorProgreso)),
-      ],
-    );
-  }
-
-  Widget _construirTarjetaLibro(Libro libro, Color colorProgreso) {
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
@@ -257,7 +263,10 @@ class _PaginaListasState extends State<PaginaListas> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => PaginaDetalleLibro(libro: libro),
+              builder: (context) => PaginaDetalleLibro(
+                libroId: docId,
+                datosLibro: data,
+              ),
             ),
           );
         },
@@ -267,7 +276,7 @@ class _PaginaListasState extends State<PaginaListas> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Imagen del libro
+              //IMAGEN LIBRO
               Container(
                 width: 60,
                 height: 90,
@@ -284,19 +293,25 @@ class _PaginaListasState extends State<PaginaListas> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.asset(
-                    libro.imagenUrl,
+                    imagenUrl,
                     fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.book, color: Colors.grey),
+                      );
+                    },
                   ),
                 ),
               ),
               const SizedBox(width: 12),
-              // Información del libro
+              //INFO LIBRO
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      libro.titulo,
+                      titulo,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -306,18 +321,18 @@ class _PaginaListasState extends State<PaginaListas> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      libro.autor,
+                      autor,
                       style: const TextStyle(
                         fontSize: 14,
                         color: Colors.grey,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    // Estrellas de calificación
+                    //RATING ESTRELLITA :)
                     Row(
                       children: List.generate(5, (index) {
                         return Icon(
-                          index < libro.calificacion
+                          index < calificacion
                               ? Icons.star
                               : Icons.star_border,
                           color: Colors.amber,
@@ -326,13 +341,13 @@ class _PaginaListasState extends State<PaginaListas> {
                       }),
                     ),
                     const SizedBox(height: 8),
-                    // Barra de progreso
+                    //BARRA DE PROGRESO SIMULADA 
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: LinearProgressIndicator(
-                        value: 0.68, // Puedes hacerlo dinámico
+                        value: 0.68,
                         backgroundColor: Colors.grey[300],
-                        color: colorProgreso,
+                        color: const Color(0xFF00A2C6),
                         minHeight: 8,
                       ),
                     ),
@@ -347,58 +362,15 @@ class _PaginaListasState extends State<PaginaListas> {
                   ],
                 ),
               ),
-              // Botón para eliminar
+              //ELIMINAR (BOTON) 
               IconButton(
                 icon: const Icon(Icons.delete_outline, color: Colors.red),
-                onPressed: () => _mostrarDialogoEliminar(libro),
+                onPressed: () => _eliminarDeFavoritos(docId),
               ),
             ],
           ),
         ),
       ),
     );
-  }
-
-  Future<void> _mostrarDialogoEliminar(Libro libro) async {
-    final resultado = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Eliminar de favoritos'),
-        content: Text(
-          '¿Estás segura que quieres eliminar "${libro.titulo}" de tus favoritos?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.red,
-            ),
-            child: const Text('Eliminar'),
-          ),
-        ],
-      ),
-    );
-
-    if (resultado == true) {
-      final exitoso =
-          await _servicioFirebase.eliminarDeFavoritos(libro.id);
-      
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              exitoso
-                  ? '✅ Eliminado de favoritos'
-                  : '❌ Error al eliminar',
-            ),
-            backgroundColor: exitoso ? Colors.green : Colors.red,
-          ),
-        );
-      }
-    }
   }
 }

@@ -1,25 +1,28 @@
-// lib/screens/libro_detalle.dart
-
 import 'package:flutter/material.dart';
-import '../models/libro.dart';
-import '../services/firebase_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PaginaDetalleLibro extends StatefulWidget {
-  final Libro libro;
+  final String libroId;
+  final Map<String, dynamic> datosLibro;
 
   const PaginaDetalleLibro({
-    Key? key,
-    required this.libro,
-  }) : super(key: key);
+    super.key,
+    required this.libroId,
+    required this.datosLibro,
+  });
 
   @override
   State<PaginaDetalleLibro> createState() => _PaginaDetalleLibroState();
 }
 
 class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
-  final ServicioFirebase _servicioFirebase = ServicioFirebase();
   bool _esFavorito = false;
   bool _cargando = false;
+
+  //CARD
+  static const double _bookWidth = 160;
+  static const double _bookHeight = 200;
+  static const double _bookRadius = 8;
 
   @override
   void initState() {
@@ -27,51 +30,82 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
     _verificarSiEsFavorito();
   }
 
-  // Verificar si el libro ya está en favoritos
+  // VERIFICAR FAVORITOS
   Future<void> _verificarSiEsFavorito() async {
-    final resultado = await _servicioFirebase.esFavorito(widget.libro.id);
-    setState(() {
-      _esFavorito = resultado;
-    });
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('mis_favoritos')
+          .doc(widget.libroId)
+          .get();
+
+      setState(() {
+        _esFavorito = doc.exists;
+      });
+    } catch (e) {
+      setState(() {
+        _esFavorito = false;
+      });
+    }
   }
 
-  // Manejar el clic en el botón de favoritos
+  // CRUD FAVORITOS
   Future<void> _manejarFavorito() async {
-    setState(() {
-      _cargando = true;
-    });
+    setState(() => _cargando = true);
 
-    final exitoso = await _servicioFirebase.alternarFavorito(widget.libro);
-
-    if (exitoso) {
-      setState(() {
-        _esFavorito = !_esFavorito;
-        _cargando = false;
-      });
-
-      // Mostrar mensaje
+    try {
+      if (_esFavorito) {
+        // ELIMINAR
+        await FirebaseFirestore.instance
+            .collection('mis_favoritos')
+            .doc(widget.libroId)
+            .delete();
+        setState(() {
+          _esFavorito = false;
+          _cargando = false;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Eliminado de favoritos'),
+              duration: Duration(seconds: 2),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } else {
+        // AGREGAR
+        await FirebaseFirestore.instance
+            .collection('mis_favoritos')
+            .doc(widget.libroId)
+            .set({
+          'titulo': widget.datosLibro['titulo'],
+          'autor': widget.datosLibro['autor'],
+          'imagenUrl': widget.datosLibro['imagenUrl'],
+          'calificacion': widget.datosLibro['calificacion'],
+          'categorias': widget.datosLibro['categorias'],
+          'paginas': widget.datosLibro['paginas'],
+          'esFavorito': true,
+        });
+        setState(() {
+          _esFavorito = true;
+          _cargando = false;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Agregado a favoritos'),
+              duration: Duration(seconds: 2),
+              backgroundColor: Colors.green,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      setState(() => _cargando = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              _esFavorito
-                  ? '❤️ Agregado a favoritos'
-                  : '💔 Eliminado de favoritos',
-            ),
-            duration: const Duration(seconds: 2),
-            backgroundColor: _esFavorito ? Colors.green : Colors.red,
-          ),
-        );
-      }
-    } else {
-      setState(() {
-        _cargando = false;
-      });
-      
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('❌ Error al actualizar favoritos'),
+            content: Text('Error: $e'),
             backgroundColor: Colors.red,
           ),
         );
@@ -81,6 +115,13 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
 
   @override
   Widget build(BuildContext context) {
+    final titulo = widget.datosLibro['titulo'] ?? 'Sin título';
+    final autor = widget.datosLibro['autor'] ?? 'Autor desconocido';
+    final imagenUrl = widget.datosLibro['imagenUrl'] ?? '';
+    final calificacion = (widget.datosLibro['calificacion'] ?? 0).toInt();
+    final categorias = List<String>.from(widget.datosLibro['categorias'] ?? []);
+    final paginas = widget.datosLibro['paginas'] ?? 0;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F0),
       appBar: AppBar(
@@ -90,7 +131,6 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
-          // Botón de favoritos
           IconButton(
             icon: _cargando
                 ? const SizedBox(
@@ -109,50 +149,52 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
           ),
           IconButton(
             icon: const Icon(Icons.share, color: Colors.white),
-            onPressed: () {
-              // Acción de compartir
-            },
+            onPressed: () {},
           ),
           IconButton(
             icon: const Icon(Icons.flag_outlined, color: Colors.white),
-            onPressed: () {
-              // Acción de reportar
-            },
+            onPressed: () {},
           ),
         ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 20),
-            // Imagen del libro
-            Container(
-              height: 250,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.3),
-                    spreadRadius: 2,
-                    blurRadius: 5,
+            const SizedBox(height: 24),
+
+            //IMAGEN LIBRO
+            Center(
+              child: SizedBox(
+                width: _bookWidth,
+                height: _bookHeight,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(_bookRadius),
+                  child: Container(
+                    color: Colors.grey[300],
+                    child: Image.asset(
+                      imagenUrl,
+                      fit: BoxFit.cover, 
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[300],
+                          child: const Center(
+                            child: Icon(Icons.book, size: 50, color: Colors.grey),
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.asset(
-                  widget.libro.imagenUrl,
-                  fit: BoxFit.cover,
                 ),
               ),
             ),
+
             const SizedBox(height: 20),
-            // Título
+
+            // TÍTULO
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                widget.libro.titulo,
+                titulo,
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -161,46 +203,53 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
               ),
             ),
             const SizedBox(height: 8),
-            // Autor
+
+            // AUTOR
             Text(
-              widget.libro.autor,
+              autor,
               style: const TextStyle(
                 fontSize: 16,
                 color: Colors.grey,
               ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
-            // Calificación con estrellas
+
+            // CALIFICACIÓN
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(5, (index) {
                 return Icon(
-                  index < widget.libro.calificacion
-                      ? Icons.star
-                      : Icons.star_border,
+                  index < calificacion ? Icons.star : Icons.star_border,
                   color: Colors.amber,
                   size: 24,
                 );
               }),
             ),
-            const SizedBox(height: 20),
-            // Categorías
-            Wrap(
-              spacing: 8,
-              children: widget.libro.categorias.map((categoria) {
-                return Chip(
-                  label: Text(categoria),
-                  backgroundColor: const Color(0xFF00A2C6),
-                  labelStyle: const TextStyle(color: Colors.white),
-                );
-              }).toList(),
+            const SizedBox(height: 16),
+
+            // CATEGORÍAS
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                alignment: WrapAlignment.center,
+                children: categorias.map((categoria) {
+                  return Chip(
+                    label: Text(categoria),
+                    backgroundColor: const Color(0xFF00A2C6),
+                    labelStyle: const TextStyle(color: Colors.white),
+                  );
+                }).toList(),
+              ),
             ),
-            const SizedBox(height: 20),
-            // Botón de leer
+
+            const SizedBox(height: 16),
+
+            // BOTÓN LEER
             ElevatedButton.icon(
-              onPressed: () {
-                // Acción de leer libro
-              },
+              onPressed: () {},
               icon: const Icon(Icons.play_circle_outline),
               label: const Text('Leer Libro'),
               style: ElevatedButton.styleFrom(
@@ -215,8 +264,10 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
                 ),
               ),
             ),
-            const SizedBox(height: 30),
-            // Tabs de información
+
+            const SizedBox(height: 24),
+
+            // TABS
             DefaultTabController(
               length: 3,
               child: Column(
@@ -235,26 +286,25 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
                     height: 300,
                     child: TabBarView(
                       children: [
-                        // Tab de progreso
-                        _construirTabProgreso(),
-                        // Tab de reseñas
-                        const Center(child: Text('Reseñas próximamente')),
-                        // Tab de estadísticas
-                        const Center(child: Text('Estadísticas próximamente')),
+                        _construirTabProgreso(paginas),
+                        const Center(child: Text('Reseñas')),
+                        const Center(child: Text('Estadísticas')),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
+
+            const SizedBox(height: 16),
           ],
         ),
       ),
     );
   }
 
-  Widget _construirTabProgreso() {
-    return Padding(
+  Widget _construirTabProgreso(int paginas) {
+    return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -277,7 +327,7 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '0 de ${widget.libro.paginas} Páginas leídas',
+                  '0 de $paginas Páginas leídas',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 16,

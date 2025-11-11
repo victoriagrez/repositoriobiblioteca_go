@@ -1,26 +1,23 @@
-// lib/services/firebase_service.dart
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/libro.dart';
 
 class ServicioFirebase {
-  // Referencia a la colección de favoritos en Firestore
   final CollectionReference _favoritos =
       FirebaseFirestore.instance.collection('mis_favoritos');
 
-  // ====== CREATE - Agregar libro a favoritos ======
+  //AGREGAR FAVS
   Future<bool> agregarAFavoritos(Libro libro) async {
     try {
       await _favoritos.doc(libro.id).set(libro.aFirebase());
-      print('✅ Libro agregado a favoritos: ${libro.titulo}');
+      print('Libro agregado a favoritos: ${libro.titulo}');
       return true;
     } catch (error) {
-      print('❌ Error al agregar favorito: $error');
+      print('Error al agregar favorito: $error');
       return false;
     }
   }
 
-  // ====== READ - Obtener todos los favoritos ======
+  //READ
   Stream<List<Libro>> obtenerFavoritos() {
     return _favoritos.snapshots().map((snapshot) {
       return snapshot.docs.map((doc) {
@@ -32,42 +29,42 @@ class ServicioFirebase {
     });
   }
 
-  // ====== READ - Verificar si un libro es favorito ======
+  //VERIFICAR FAV
   Future<bool> esFavorito(String libroId) async {
     try {
       final doc = await _favoritos.doc(libroId).get();
       return doc.exists;
     } catch (error) {
-      print('❌ Error al verificar favorito: $error');
+      print('Error al verificar favorito: $error');
       return false;
     }
   }
 
-  // ====== UPDATE - Actualizar datos del libro favorito ======
+  //ACTUALIZAR FAVS
   Future<bool> actualizarFavorito(Libro libro) async {
     try {
       await _favoritos.doc(libro.id).update(libro.aFirebase());
-      print('✅ Favorito actualizado: ${libro.titulo}');
+      print('Favorito actualizado: ${libro.titulo}');
       return true;
     } catch (error) {
-      print('❌ Error al actualizar favorito: $error');
+      print('Error al actualizar favorito: $error');
       return false;
     }
   }
 
-  // ====== DELETE - Eliminar de favoritos ======
+  //ELIMINAR FAVS
   Future<bool> eliminarDeFavoritos(String libroId) async {
     try {
       await _favoritos.doc(libroId).delete();
-      print('✅ Libro eliminado de favoritos');
+      print('Libro eliminado de favoritos');
       return true;
     } catch (error) {
-      print('❌ Error al eliminar favorito: $error');
+      print('Error al eliminar favorito: $error');
       return false;
     }
   }
 
-  // Método auxiliar para alternar favorito (agregar o eliminar)
+  //+ O -
   Future<bool> alternarFavorito(Libro libro) async {
     final yaEsFavorito = await esFavorito(libro.id);
     

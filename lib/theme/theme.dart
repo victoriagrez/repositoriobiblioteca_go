@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  // Tema claro
+  //CLARO
   static ThemeData lightTheme = FlexThemeData.light(
     scheme: FlexScheme.blueM3,
     subThemesData: const FlexSubThemesData(
@@ -23,7 +23,7 @@ class AppTheme {
     fontFamily: GoogleFonts.notoSans().fontFamily,
   );
 
-  // Tema oscuro
+  //OSCURO
   static ThemeData darkTheme = FlexThemeData.dark(
     scheme: FlexScheme.blueM3,
     subThemesData: const FlexSubThemesData(

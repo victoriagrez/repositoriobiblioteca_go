@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/material_symbols_icons.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:biblioteca_go/screens/home.dart';
+import 'onboarding.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,14 +14,17 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+
+    //NAVEGACION ONBOARDING
     Future.delayed(const Duration(seconds: 2), () {
       if (!mounted) return;
       setState(() => _opacity = 0.0);
+
       Future.delayed(const Duration(milliseconds: 500), () {
         if (!mounted) return;
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          MaterialPageRoute(builder: (_) => const OnboardingPage()),
         );
       });
     });
@@ -31,9 +32,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final scheme = Theme.of(context).colorScheme; 
+
     return Scaffold(
-      backgroundColor: cs.primary, // ← color primario desde FlexColorScheme
+      backgroundColor: scheme.primary,
       body: Center(
         child: AnimatedOpacity(
           duration: const Duration(milliseconds: 500),
@@ -41,21 +43,39 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                Symbols.book_ribbon, // ← Google Material Symbol
-                size: 96,
-                color: cs.onPrimary,
-                // Opcional: estilos del símbolo (outlined/filled/weight/grade):
-                // fill: 0, weight: 400, grade: 0, opticalSize: 48,
+              // ICONO LIBRO
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: scheme.onPrimary.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.book,
+                  size: 80,
+                  color: scheme.onPrimary,
+                ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
+
+              // NOMBRE
               Text(
                 'BibliotecaGo',
-                style: GoogleFonts.poppins( // o GoogleFonts.poppins()
-                  fontSize: 28,
-                  fontWeight: FontWeight.w600,
-                  color: cs.onPrimary,
-                  letterSpacing: .2,
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: scheme.onPrimary,
+                  letterSpacing: 1.2,
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              Text(
+                'Tu biblioteca digital',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: scheme.onPrimary.withOpacity(0.8),
+                  letterSpacing: 0.5,
                 ),
               ),
             ],

@@ -1,5 +1,3 @@
-// lib/screens/buscar.dart
-
 import 'package:flutter/material.dart';
 
 class PaginaBuscar extends StatefulWidget {
@@ -32,7 +30,7 @@ class _PaginaBuscarState extends State<PaginaBuscar> {
       ),
       body: Column(
         children: [
-          // Barra de búsqueda
+      //SEARCHBAR
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
@@ -65,7 +63,7 @@ class _PaginaBuscarState extends State<PaginaBuscar> {
               ),
             ),
           ),
-          // Resultados de búsqueda
+        //RESULTA2
           Expanded(
             child: _textoBusqueda.isEmpty
                 ? Center(
