@@ -1,11 +1,9 @@
-// MAIN //NO PROGRAMAR TODO AQUI!
+// MAIN //NO PROGRAMAR
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'screens/splashscreen.dart';
 
-import 'screens/home.dart';       
-import 'theme/theme.dart';  
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 

@@ -54,14 +54,13 @@ class _PaginaBuscarState extends State<PaginaBuscar> {
         children: [
           const SizedBox(height: 16),
 
-          // Botón "Ver catálogo completo"
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // TODO: Acción para ver catálogo completo
+                 
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primary,
