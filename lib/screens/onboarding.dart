@@ -195,7 +195,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
         decoration: BoxDecoration(
-          color: seleccionada ? scheme.primary.withOpacity(0.12) : Colors.white,
+          color: seleccionada ? scheme.primary.withValues(alpha: 0.12) : Colors.white,
           border: Border.all(
             color: seleccionada ? scheme.primary : const Color(0xFFE0E0E0),
             width: seleccionada ? 2 : 1.5,

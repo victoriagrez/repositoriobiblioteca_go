@@ -24,7 +24,7 @@ class AppTheme {
     subThemesData: const FlexSubThemesData(
       blendOnLevel: 0,
       blendOnColors: false,
-      useTextTheme: true,
+      useMaterial3Typography: true,
       useM2StyleDividerInM3: true,
       defaultRadius: 8.0,
     ),
@@ -70,7 +70,7 @@ class AppTheme {
     subThemesData: const FlexSubThemesData(
       blendOnLevel: 0,
       blendOnColors: false,
-      useTextTheme: true,
+      useMaterial3Typography: true,
       useM2StyleDividerInM3: true,
       defaultRadius: 8.0,
     ),

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import '../models/libro.dart';
 
 class ServicioFirebase {
@@ -9,10 +10,10 @@ class ServicioFirebase {
   Future<bool> agregarAFavoritos(Libro libro) async {
     try {
       await _favoritos.doc(libro.id).set(libro.aFirebase());
-      print('Libro agregado a favoritos: ${libro.titulo}');
+      debugPrint('Libro agregado a favoritos: ${libro.titulo}');
       return true;
     } catch (error) {
-      print('Error al agregar favorito: $error');
+      debugPrint('Error al agregar favorito: $error');
       return false;
     }
   }
@@ -33,7 +34,7 @@ class ServicioFirebase {
       final doc = await _favoritos.doc(libroId).get();
       return doc.exists;
     } catch (error) {
-      print('Error al verificar favorito: $error');
+      debugPrint('Error al verificar favorito: $error');
       return false;
     }
   }
@@ -41,10 +42,10 @@ class ServicioFirebase {
   Future<bool> actualizarFavorito(Libro libro) async {
     try {
       await _favoritos.doc(libro.id).update(libro.aFirebase());
-      print('Favorito actualizado: ${libro.titulo}');
+      debugPrint('Favorito actualizado: ${libro.titulo}');
       return true;
     } catch (error) {
-      print('Error al actualizar favorito: $error');
+      debugPrint('Error al actualizar favorito: $error');
       return false;
     }
   }
@@ -52,10 +53,10 @@ class ServicioFirebase {
   Future<bool> eliminarDeFavoritos(String libroId) async {
     try {
       await _favoritos.doc(libroId).delete();
-      print('Libro eliminado de favoritos');
+      debugPrint('Libro eliminado de favoritos');
       return true;
     } catch (error) {
-      print('Error al eliminar favorito: $error');
+      debugPrint('Error al eliminar favorito: $error');
       return false;
     }
   }

@@ -24,7 +24,7 @@ class _PaginaBuscarState extends State<PaginaBuscar> {
     final primary = scheme.primary;
     final onPrimary = scheme.onPrimary;
     final surface = scheme.surface;
-    final surfaceVariant = scheme.surfaceVariant;
+    final surfaceVariant = scheme.surfaceContainerHighest;
 
     return Scaffold(
       backgroundColor: surface,

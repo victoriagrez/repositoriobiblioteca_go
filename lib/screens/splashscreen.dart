@@ -47,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen> {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: scheme.onPrimary.withOpacity(0.2),
+                  color: scheme.onPrimary.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -74,7 +74,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 'Tu biblioteca digital',
                 style: TextStyle(
                   fontSize: 16,
-                  color: scheme.onPrimary.withOpacity(0.8),
+                  color: scheme.onPrimary.withValues(alpha: 0.8),
                   letterSpacing: 0.5,
                 ),
               ),

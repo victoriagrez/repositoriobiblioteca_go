@@ -52,7 +52,7 @@ class BibliotecaApp extends StatelessWidget {
         subThemesData: const FlexSubThemesData(
           blendOnLevel: 10,
           blendOnColors: false,
-          useTextTheme: true,
+          useMaterial3Typography: true,
         ),
         visualDensity: FlexColorScheme.comfortablePlatformDensity,
         useMaterial3: true,

@@ -48,6 +48,9 @@ class _PaginaMetasState extends State<PaginaMetas> {
                     'fecha': FieldValue.serverTimestamp(),
                     'completado': false,
                   });
+                  
+                  if (!context.mounted) return;
+                  
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -107,6 +110,8 @@ class _PaginaMetasState extends State<PaginaMetas> {
                       .doc(docId)
                       .update({'metas': nuevasMetas});
 
+                  if (!context.mounted) return;
+
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -156,6 +161,8 @@ class _PaginaMetasState extends State<PaginaMetas> {
           .doc(docId)
           .delete();
 
+      if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Meta eliminada'),
@@ -171,6 +178,8 @@ class _PaginaMetasState extends State<PaginaMetas> {
         .collection('metas_lectura')
         .doc(docId)
         .update({'completado': !completadoActual});
+
+    if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -213,7 +222,6 @@ class _PaginaMetasState extends State<PaginaMetas> {
               child: CircularProgressIndicator(color: scheme.primary),
             );
           }
-
 
           if (snapshot.hasError) {
             return Center(
