@@ -6,7 +6,6 @@ class ServicioFirebase {
   final CollectionReference _favoritos =
       FirebaseFirestore.instance.collection('mis_favoritos');
 
-  //AGREGAR FAVS
   Future<bool> agregarAFavoritos(Libro libro) async {
     try {
       await _favoritos.doc(libro.id).set(libro.aFirebase());

@@ -21,7 +21,6 @@ class _BuscarPageState extends State<BuscarPage> {
   int _selectedIndex = 1;
   String _selectedFilter = 'No ficción';
 
-  // Filtros
   final List<String> _filters = [
     'Ficción',
     'Clásicos',
@@ -29,7 +28,6 @@ class _BuscarPageState extends State<BuscarPage> {
     'Historia',
   ];
 
-  // CONVERTIMOS tus libros “Map” a modelo Libro (MISMO QUE HOME)
   final List<Libro> _books = [
     Libro(
       id: 'libro_romano',
@@ -153,7 +151,6 @@ class _BuscarPageState extends State<BuscarPage> {
     super.dispose();
   }
 
-  // ❤️ IGUAL QUE HOME.DART
   Future<void> _alternarFavorito(Libro libro) async {
     final exitoso = await _servicioFirebase.alternarFavorito(libro);
 
@@ -228,7 +225,6 @@ class _BuscarPageState extends State<BuscarPage> {
         children: [
           const SizedBox(height: 16),
 
-          // Botón catálogo
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: SizedBox(
@@ -263,7 +259,6 @@ class _BuscarPageState extends State<BuscarPage> {
 
           const SizedBox(height: 24),
 
-          // Título
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
@@ -278,7 +273,6 @@ class _BuscarPageState extends State<BuscarPage> {
 
           const SizedBox(height: 20),
 
-          // Barra de búsqueda
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: _buildSearchBar(scheme),
@@ -286,17 +280,14 @@ class _BuscarPageState extends State<BuscarPage> {
 
           const SizedBox(height: 16),
 
-          // Filtros
           _buildFilters(scheme),
 
           const SizedBox(height: 24),
 
-          // Título sección
           _buildSectionTitle(scheme),
 
           const SizedBox(height: 16),
 
-          // GRID
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -432,7 +423,6 @@ class _BuscarPageState extends State<BuscarPage> {
     );
   }
 
-  // CARD CON MISMO ICONO DE FAVORITOS DE HOME
   Widget _buildBookCard(Libro libro, ColorScheme scheme) {
     return GestureDetector(
       onTap: () {
@@ -456,7 +446,6 @@ class _BuscarPageState extends State<BuscarPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Imagen con icono
           Expanded(
             child: Stack(
               children: [
@@ -489,7 +478,6 @@ class _BuscarPageState extends State<BuscarPage> {
                   ),
                 ),
 
-                // ❤️ MISMO ICONO DE HOME.DART
                 Positioned(
                   top: 8,
                   right: 8,
@@ -532,7 +520,6 @@ class _BuscarPageState extends State<BuscarPage> {
 
           const SizedBox(height: 6),
 
-          // Título
           Text(
             libro.titulo,
             style: const TextStyle(

@@ -11,7 +11,7 @@ class OnboardingPage extends StatefulWidget {
 }
 
 class _OnboardingPageState extends State<OnboardingPage> {
-//METAS EJ: 
+
   final List<Map<String, dynamic>> _metas = [
     {'titulo': 'Rastrear y mejorar mis hábitos', 'seleccionada': false},
     {'titulo': 'Compartir mi viaje de lectura', 'seleccionada': false},
@@ -28,12 +28,10 @@ class _OnboardingPageState extends State<OnboardingPage> {
     });
   }
 
-// CRUD METAS
   Future<void> _guardarMetas() async {
     setState(() => _guardando = true);
 
     try {
-    //SELECCION META
       final metasSeleccionadas = _metas
           .where((meta) => meta['seleccionada'] == true)
           .map((meta) => meta['titulo'])
@@ -50,7 +48,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
         return;
       }
 
-    //FIREBASE METAS LECTURA
       await FirebaseFirestore.instance.collection('metas_lectura').add({
         'metas': metasSeleccionadas,
         'fecha': FieldValue.serverTimestamp(),
@@ -143,7 +140,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
               
               const SizedBox(height: 20),
               
-            // BOTON CONTINUAR
               SizedBox(
                 width: double.infinity,
                 height: 56,
@@ -185,7 +181,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-//BOTON 
   Widget _construirBotonMeta(String titulo, bool seleccionada, VoidCallback onTap) {
     final scheme = Theme.of(context).colorScheme;
 

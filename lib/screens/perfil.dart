@@ -11,11 +11,9 @@ class PerfilPage extends StatefulWidget {
 }
 
 class _PerfilPageState extends State<PerfilPage> {
-  int _selectedIndex = 4; // Perfil es el índice 4
+  int _selectedIndex = 4; 
 
-  // 🔗 URL de la foto de perfil desde Firebase Storage
-  // Ve a Firebase Storage -> selecciona la imagen -> "Obtener URL de descarga"
-  // y pégala acá:
+ 
   static const String _urlFotoPerfil =
       'https://firebasestorage.googleapis.com/v0/b/TU-BUCKET/o/portadas%2Fwoman.jpg?alt=media&token=...';
 
@@ -27,16 +25,16 @@ class _PerfilPageState extends State<PerfilPage> {
     });
 
     switch (index) {
-      case 0: // Inicio
+      case 0: 
         Navigator.pop(context);
         break;
-      case 1: // Buscar
+      case 1: 
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const BuscarPage()),
         );
         break;
-      case 2: // Libros
+      case 2: 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Lectura rápida')),
         );
@@ -44,13 +42,13 @@ class _PerfilPageState extends State<PerfilPage> {
           _selectedIndex = 4;
         });
         break;
-      case 3: // Listas
+      case 3: 
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const PaginaListas()),
         );
         break;
-      case 4: // Perfil - Ya estamos aquí
+      case 4: 
         break;
     }
   }
@@ -155,7 +153,6 @@ class _PerfilPageState extends State<PerfilPage> {
 
             const SizedBox(height: 16),
 
-            // ETIQUETAS DE CATEGORÍAS
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Wrap(
@@ -172,7 +169,6 @@ class _PerfilPageState extends State<PerfilPage> {
 
             const SizedBox(height: 32),
 
-            // SECCIÓN FAVORITOS
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Row(
@@ -187,7 +183,6 @@ class _PerfilPageState extends State<PerfilPage> {
                   ),
                   TextButton(
                     onPressed: () {
-                      // Ir a listas
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(builder: (context) => const PaginaListas()),
@@ -208,7 +203,6 @@ class _PerfilPageState extends State<PerfilPage> {
 
             const SizedBox(height: 16),
 
-            // LISTA DE LIBROS FAVORITOS (dummy, sin Storage por ahora)
             SizedBox(
               height: 200,
               child: ListView(
@@ -231,7 +225,6 @@ class _PerfilPageState extends State<PerfilPage> {
 
             const SizedBox(height: 32),
 
-            // SECCIÓN PROGRESO LECTURA
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
@@ -245,7 +238,6 @@ class _PerfilPageState extends State<PerfilPage> {
 
             const SizedBox(height: 16),
 
-            // TARJETA DE PROGRESO
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Container(
@@ -256,7 +248,6 @@ class _PerfilPageState extends State<PerfilPage> {
                 ),
                 child: Row(
                   children: [
-                    // Texto izquierda
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -310,7 +301,6 @@ class _PerfilPageState extends State<PerfilPage> {
                     ),
                     const SizedBox(width: 16),
 
-                    // CÍRCULO DE PROGRESO
                     SizedBox(
                       width: 80,
                       height: 80,
@@ -352,7 +342,6 @@ class _PerfilPageState extends State<PerfilPage> {
         ),
       ),
 
-      // BOTTOM NAVIGATION
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
@@ -385,7 +374,6 @@ class _PerfilPageState extends State<PerfilPage> {
     );
   }
 
-  // CHIP DE CATEGORÍA
   Widget _buildCategoryChip(String label) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -408,7 +396,6 @@ class _PerfilPageState extends State<PerfilPage> {
     );
   }
 
-  // TARJETA DE LIBRO FAVORITO (solo icono por ahora)
   Widget _buildFavoriteBookCard(
     String title,
     String author,
@@ -431,7 +418,6 @@ class _PerfilPageState extends State<PerfilPage> {
       ),
       child: Row(
         children: [
-          // Imagen del libro (por ahora icono, si quieres luego lo cambiamos a NetworkImage)
           Container(
             width: 60,
             height: 90,
@@ -447,7 +433,6 @@ class _PerfilPageState extends State<PerfilPage> {
           ),
           const SizedBox(width: 12),
 
-          // Info del libro
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -471,7 +456,6 @@ class _PerfilPageState extends State<PerfilPage> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                // Estrellas
                 Row(
                   children: List.generate(
                     5,
@@ -483,7 +467,6 @@ class _PerfilPageState extends State<PerfilPage> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                // Barra de progreso
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

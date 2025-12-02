@@ -23,7 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _passwordController.dispose();
     super.dispose();
   }
-//LOGINN
+
   Future<void> _signInWithGoogle() async {
     setState(() => _isLoading = true);
 
@@ -90,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 const SizedBox(height: 16),
 
-                // Título
+           
                 Text(
                   'Biblioteca',
                   style: TextStyle(
@@ -111,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 40),
 
-                // Email
+        
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -147,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 16),
 
-                // Contraseña
+   
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -212,7 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 8),
 
-                // Botón Iniciar Sesión
+      
                 SizedBox(
                   width: double.infinity,
                   height: 52,
@@ -237,7 +237,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 12),
 
-                // Botón Registrarse
+       
                 SizedBox(
                   width: double.infinity,
                   height: 52,
@@ -262,7 +262,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 24),
 
-                // Divider con "o"
+ 
                 Row(
                   children: [
                     Expanded(
@@ -292,7 +292,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 24),
 
-                // SOLO Google
+
                 if (_isLoading)
                   const CircularProgressIndicator()
                 else
@@ -302,7 +302,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: OutlinedButton.icon(
                       onPressed: _signInWithGoogle,
                       icon: const Icon(
-                        Icons.g_mobiledata, // si tienes logo de Google en assets, lo cambias acá
+                        Icons.g_mobiledata, 
                         size: 30,
                       ),
                       label: const Text(

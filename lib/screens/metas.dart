@@ -10,7 +10,6 @@ class PaginaMetas extends StatefulWidget {
 }
 
 class _PaginaMetasState extends State<PaginaMetas> {
-// CRUD 1 METAS EN ONBOARDING :)
   void _agregarMeta() async {
     final controlador = TextEditingController();
 
@@ -68,7 +67,6 @@ class _PaginaMetasState extends State<PaginaMetas> {
     );
   }
 
-  // CRUD (EDITAR)
   void _editarMeta(String docId, List<dynamic> metasActuales) async {
     final controlador = TextEditingController(text: metasActuales.join('\n'));
 
@@ -172,7 +170,7 @@ class _PaginaMetasState extends State<PaginaMetas> {
     }
   }
 
-//COMPLETAR
+
   void _marcarCompletada(String docId, bool completadoActual) async {
     await FirebaseFirestore.instance
         .collection('metas_lectura')
@@ -252,7 +250,6 @@ class _PaginaMetasState extends State<PaginaMetas> {
             );
           }
 
-// CRUD 1 MOSTRAR META
           final docs = snapshot.data!.docs;
 
           return ListView.builder(
@@ -275,7 +272,7 @@ class _PaginaMetasState extends State<PaginaMetas> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      //HEADER
+              
                       Row(
                         children: [
                           Checkbox(
@@ -318,7 +315,7 @@ class _PaginaMetasState extends State<PaginaMetas> {
                       ),
                       const Divider(),
                       const SizedBox(height: 8),
-                      //LISTA
+       
                       ...metas.map((meta) => Padding(
                             padding: const EdgeInsets.only(bottom: 8),
                             child: Row(

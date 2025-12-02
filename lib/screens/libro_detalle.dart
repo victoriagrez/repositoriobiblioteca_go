@@ -25,11 +25,10 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
   bool _cargando = false;
   final ServicioReviews _servicioReviews = ServicioReviews();
 
-  // ID de usuario hardcodeado (reemplazar con Firebase Auth en producción)
   final String _usuarioActualId = 'usuario_demo_123';
   final String _nombreUsuario = 'Germán Martínez';
   final String _fotoPerfilUsuario =
-      'https://via.placeholder.com/50'; // O desde Firebase Auth
+      'https://via.placeholder.com/50'; 
 
   static const double _bookWidth = 160;
   static const double _bookHeight = 200;
@@ -41,7 +40,6 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
     _verificarSiEsFavorito();
   }
 
-  // VERIFICAR FAVORITOS
   Future<void> _verificarSiEsFavorito() async {
     try {
       final doc = await FirebaseFirestore.instance
@@ -59,7 +57,6 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
     }
   }
 
-  // CRUD FAVORITOS
   Future<void> _manejarFavorito() async {
     setState(() => _cargando = true);
 
@@ -122,7 +119,6 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
     }
   }
 
-  // MOSTRAR DIÁLOGO PARA AGREGAR/EDITAR REVIEW
   Future<void> _mostrarDialogoReview({Review? reviewExistente}) async {
     final resultado = await showDialog<Map<String, dynamic>>(
       context: context,
@@ -134,13 +130,13 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
 
     if (resultado != null) {
       if (reviewExistente == null) {
-        // Crear nueva review
+
         await _crearReview(
           resultado['calificacion'],
           resultado['textoResena'],
         );
       } else {
-        // Actualizar review existente
+
         await _actualizarReview(
           reviewExistente,
           resultado['calificacion'],
@@ -150,10 +146,9 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
     }
   }
 
-  // CREATE - Crear nueva reseña
+
   Future<void> _crearReview(int calificacion, String textoResena) async {
     try {
-      // Verificar si ya existe una reseña del usuario
       final reviewExistente = await _servicioReviews
           .obtenerReviewUsuarioEnLibro(widget.libroId, _usuarioActualId);
 
@@ -170,7 +165,7 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
       }
 
       final nuevaReview = Review(
-        id: '', // Firebase genera el ID
+        id: '', 
         libroId: widget.libroId,
         usuarioId: _usuarioActualId,
         nombreUsuario: _nombreUsuario,
@@ -204,7 +199,6 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
     }
   }
 
-  // UPDATE - Actualizar reseña
   Future<void> _actualizarReview(
       Review review, int calificacion, String textoResena) async {
     try {
@@ -240,7 +234,6 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
     }
   }
 
-  // DELETE - Eliminar reseña
   Future<void> _eliminarReview(Review review) async {
     final confirmar = await showDialog<bool>(
       context: context,
@@ -342,7 +335,6 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
           children: [
             const SizedBox(height: 24),
 
-            // IMAGEN LIBRO
             Center(
               child: SizedBox(
                 width: _bookWidth,
@@ -385,7 +377,6 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
 
             const SizedBox(height: 20),
 
-            // TÍTULO
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
@@ -399,7 +390,6 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
             ),
             const SizedBox(height: 8),
 
-            // AUTOR
             Text(
               autor,
               style: const TextStyle(
@@ -410,7 +400,6 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
             ),
             const SizedBox(height: 16),
 
-            // CALIFICACIÓN
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(5, (index) {
@@ -423,7 +412,6 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
             ),
             const SizedBox(height: 16),
 
-            // CATEGORÍAS
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Wrap(
@@ -442,7 +430,6 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
 
             const SizedBox(height: 16),
 
-            // BOTÓN LEER
             ElevatedButton.icon(
               onPressed: () {},
               icon: const Icon(Icons.play_circle_outline),
@@ -462,7 +449,6 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
 
             const SizedBox(height: 24),
 
-            // TABS
             DefaultTabController(
               length: 3,
               child: Column(
@@ -574,7 +560,6 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
     );
   }
 
-  // TAB DE REVIEWS CON CRUD COMPLETO
   Widget _construirTabReviews() {
     return StreamBuilder<List<Review>>(
       stream: _servicioReviews.obtenerReviewsPorLibro(widget.libroId),
@@ -596,7 +581,7 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header con título y botón agregar
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -627,7 +612,6 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
               ),
               const SizedBox(height: 20),
 
-              // Lista de reviews
               if (reviews.isEmpty)
                 const Center(
                   child: Padding(
@@ -651,7 +635,6 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
     );
   }
 
-  // TARJETA DE REVIEW INDIVIDUAL
   Widget _construirTarjetaReview(Review review) {
     final formatoFecha = DateFormat('dd/MM/yyyy');
     final esPropia = review.usuarioId == _usuarioActualId;
@@ -673,10 +656,8 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header: foto, nombre, fecha, acciones
           Row(
             children: [
-              // Foto de perfil
               CircleAvatar(
                 radius: 20,
                 backgroundColor: AppTheme.azulSecundario,
@@ -694,7 +675,6 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
                     : null,
               ),
               const SizedBox(width: 12),
-              // Nombre y fecha
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -716,7 +696,6 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
                   ],
                 ),
               ),
-              // Botones de editar/eliminar (solo para reviews propias)
               if (esPropia)
                 PopupMenuButton<String>(
                   onSelected: (value) {
@@ -754,7 +733,6 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
           ),
           const SizedBox(height: 12),
 
-          // Calificación
           Row(
             children: [
               Text(
@@ -776,7 +754,6 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
           ),
           const SizedBox(height: 12),
 
-          // Texto de la reseña
           Text(
             review.textoResena,
             style: const TextStyle(
@@ -785,13 +762,11 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
             ),
           ),
 
-          // Botón "Ver Más" (si el texto es largo)
           if (review.textoResena.length > 150)
             Align(
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: () {
-                  // Mostrar diálogo con texto completo
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(

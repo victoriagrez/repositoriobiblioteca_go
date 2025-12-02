@@ -59,7 +59,7 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // ICONO LIBRO
+              
               Container(
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
@@ -74,7 +74,6 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
               const SizedBox(height: 24),
 
-              // NOMBRE APP
               Text(
                 'BibliotecaGo',
                 style: TextStyle(

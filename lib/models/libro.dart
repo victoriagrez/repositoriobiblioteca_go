@@ -34,7 +34,6 @@ class Libro {
     );
   }
 
-  //MAP
   Map<String, dynamic> aFirebase() {
     return {
       'titulo': titulo,
@@ -47,7 +46,6 @@ class Libro {
     };
   }
 
-  //COPIA
   Libro copiarCon({
     String? id,
     String? titulo,
