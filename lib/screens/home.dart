@@ -8,12 +8,11 @@ import '../services/firebase_service.dart';
 import 'libro_detalle.dart';
 import 'buscar.dart';
 import 'listas.dart';
-import 'perfil.dart'; // 👈 Agregamos import de perfil
-import 'login.dart';  
+import 'perfil.dart';
+import 'login.dart';
 import '../theme/theme.dart';
 import '../data/portadas_urls.dart';
-
-
+import 'admin_libros_screen.dart'; // 👈 NUEVO IMPORT
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,96 +28,90 @@ class _HomeScreenState extends State<HomeScreen> {
   static const double _coverWidth = 160;
   static const double _coverHeight = 220;
 
-  // LIBROS DISPONIBLES - ahora usando URLs de Storage
   final List<Libro> _librosNuevos = [
-  Libro(
-    id: 'libro_principito',
-    titulo: 'El Principito',
-    autor: 'Antoine de Saint-Exupéry',
-    imagenUrl: kUrlPortadaPrincipito,
-    calificacion: 5,
-    categorias: ['Arte', 'Infantil'],
-    paginas: 96,
-  ),
-  Libro(
-    id: 'libro_albatros',
-    titulo: 'El albatros negro',
-    autor: 'María Dueñas',
-    imagenUrl: kUrlPortadaAlbatros,
-    calificacion: 5,
-    categorias: ['Historia', 'Novela'],
-    paginas: 450,
-  ),
-  Libro(
-    id: 'libro_zoo',
-    titulo: 'La muy catastrófica visita al zoo',
-    autor: 'Varios autores',
-    imagenUrl: kUrlPortadaZoo,
-    calificacion: 5,
-    categorias: ['Infantil', 'Humor'],
-    paginas: 120,
-  ),
-];
-
+    Libro(
+      id: 'libro_principito',
+      titulo: 'El Principito',
+      autor: 'Antoine de Saint-Exupéry',
+      imagenUrl: kUrlPortadaPrincipito,
+      calificacion: 5,
+      categorias: ['Arte', 'Infantil'],
+      paginas: 96,
+    ),
+    Libro(
+      id: 'libro_albatros',
+      titulo: 'El albatros negro',
+      autor: 'María Dueñas',
+      imagenUrl: kUrlPortadaAlbatros,
+      calificacion: 5,
+      categorias: ['Historia', 'Novela'],
+      paginas: 450,
+    ),
+    Libro(
+      id: 'libro_zoo',
+      titulo: 'La muy catastrófica visita al zoo',
+      autor: 'Varios autores',
+      imagenUrl: kUrlPortadaZoo,
+      calificacion: 5,
+      categorias: ['Infantil', 'Humor'],
+      paginas: 120,
+    ),
+  ];
 
   final List<Libro> _librosParaTi = [
-  Libro(
-    id: 'libro_desquiciada',
-    titulo: 'Nuestra desquiciada historia de amor',
-    autor: 'Sandy Nelson',
-    imagenUrl: kUrlPortadaDesquiciada,
-    calificacion: 5,
-    categorias: ['Romance', 'Drama'],
-    paginas: 320,
-  ),
-  Libro(
-    id: 'libro_amanecer',
-    titulo: 'Amanecer en la cosecha',
-    autor: 'Autor desconocido',
-    imagenUrl: kUrlPortadaAmanecer,
-    calificacion: 5,
-    categorias: ['Fantasía', 'Aventura'],
-    paginas: 280,
-  ),
-  Libro(
-    id: 'libro_romano',
-    titulo: 'Mi año romano',
-    autor: 'André Aciman',
-    imagenUrl: kUrlPortadaRomano,
-    calificacion: 5,
-    categorias: ['Memorias', 'Romance'],
-    paginas: 250,
-  ),
-  Libro(
-    id: 'libro_emilia',
-    titulo: 'Mi nombre es Emilia del Valle',
-    autor: 'Isabel Allende',
-    imagenUrl: kUrlPortadaEmilia,
-    calificacion: 5,
-    categorias: ['Ficción', 'Latinoamericana'],
-    paginas: 320,
-  ),
-];
-
+    Libro(
+      id: 'libro_desquiciada',
+      titulo: 'Nuestra desquiciada historia de amor',
+      autor: 'Sandy Nelson',
+      imagenUrl: kUrlPortadaDesquiciada,
+      calificacion: 5,
+      categorias: ['Romance', 'Drama'],
+      paginas: 320,
+    ),
+    Libro(
+      id: 'libro_amanecer',
+      titulo: 'Amanecer en la cosecha',
+      autor: 'Autor desconocido',
+      imagenUrl: kUrlPortadaAmanecer,
+      calificacion: 5,
+      categorias: ['Fantasía', 'Aventura'],
+      paginas: 280,
+    ),
+    Libro(
+      id: 'libro_romano',
+      titulo: 'Mi año romano',
+      autor: 'André Aciman',
+      imagenUrl: kUrlPortadaRomano,
+      calificacion: 5,
+      categorias: ['Memorias', 'Romance'],
+      paginas: 250,
+    ),
+    Libro(
+      id: 'libro_emilia',
+      titulo: 'Mi nombre es Emilia del Valle',
+      autor: 'Isabel Allende',
+      imagenUrl: kUrlPortadaEmilia,
+      calificacion: 5,
+      categorias: ['Ficción', 'Latinoamericana'],
+      paginas: 320,
+    ),
+  ];
 
   void _onItemTapped(int index) {
-    if (index == _selectedIndex) return; // Ya estamos en esta página
+    if (index == _selectedIndex) return;
 
     setState(() {
       _selectedIndex = index;
     });
 
-    // Navegación mejorada
     switch (index) {
       case 0:
-        // Ya estamos en Home, no hacer nada
         break;
       case 1:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const BuscarPage()),
         ).then((_) {
-          // Resetear índice cuando regrese
           setState(() {
             _selectedIndex = 0;
           });
@@ -129,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SnackBar(content: Text('Lectura rápida')),
         );
         setState(() {
-          _selectedIndex = 0; // Resetear
+          _selectedIndex = 0;
         });
         break;
       case 3:
@@ -156,31 +149,29 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _signOut() async {
-  try {
-    await GoogleSignIn().signOut();
-    await FirebaseAuth.instance.signOut();
+    try {
+      await GoogleSignIn().signOut();
+      await FirebaseAuth.instance.signOut();
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Sesión cerrada exitosamente')),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sesión cerrada exitosamente')),
+      );
 
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
-      (route) => false,
-    );
-  } catch (e) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error al cerrar sesión: $e')),
-    );
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+        (route) => false,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al cerrar sesión: $e')),
+      );
+    }
   }
-}
 
-
-  // AGREGAR Y ELIMINAR FAVORITOS
   Future<void> _alternarFavorito(Libro libro) async {
     final exitoso = await _servicioFirebase.alternarFavorito(libro);
 
@@ -272,6 +263,18 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           IconButton(
+            icon: const Icon(Icons.edit, color: Colors.white),
+            tooltip: 'Administrar libros',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const AdminLibrosScreen(),
+                ),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.logout, color: Colors.white),
             onPressed: _signOut,
             tooltip: 'Cerrar sesión',
@@ -283,8 +286,6 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
-
-            // RETO LECTOR
             CarouselSlider(
               options: CarouselOptions(
                 height: 200,
@@ -298,8 +299,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
             const SizedBox(height: 30),
-
-            // LANZAMIENTOS
             _buildSectionHeader('Nuevos\nlanzamientos', primary),
             const SizedBox(height: 16),
             SizedBox(
@@ -314,8 +313,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 30),
-
-            // PARA TI
             _buildSectionHeader('Para ti', primary),
             const SizedBox(height: 16),
             SizedBox(
@@ -380,9 +377,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           TextButton(
-            onPressed: () {
-              // VER MÁS
-            },
+            onPressed: () {},
             child: Text(
               'Ver más',
               style: TextStyle(
@@ -555,7 +550,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
                         child: Icon(
-                          esFavorito ? Icons.bookmark : Icons.bookmark_border,
+                          esFavorito
+                              ? Icons.bookmark
+                              : Icons.bookmark_border,
                           color: secondary,
                           size: 24,
                         ),
