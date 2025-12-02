@@ -48,7 +48,6 @@ class MyApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
 
-      // Siempre partimos en Splash
       home: const SplashScreen(),
     );
   }

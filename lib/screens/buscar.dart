@@ -16,7 +16,7 @@ class BuscarPage extends StatefulWidget {
 
 class _BuscarPageState extends State<BuscarPage> {
   final TextEditingController _searchController = TextEditingController();
-  final ServicioFirebase _servicioFirebase = ServicioFirebase(); // 💙 IGUAL QUE HOME
+  final ServicioFirebase _servicioFirebase = ServicioFirebase();
 
   int _selectedIndex = 1;
   String _selectedFilter = 'No ficción';
