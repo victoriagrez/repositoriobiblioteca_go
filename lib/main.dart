@@ -1,63 +1,54 @@
-// MAIN //NO PROGRAMAR
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'screens/splashscreen.dart';
+
+import 'package:biblioteca_go/theme/theme.dart';
+import 'package:biblioteca_go/screens/splashscreen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  try {
+  // Hola profe, Hice una version con Inicialización de Firebase sin opciones manuales, 
+  //ya que tuve problemas con la aplicacion que se me crasheaba con el login
+  // de google y no me dejaba ver bien la app por que no pasaba de el icono de el launcher
+  //, mi solucion fue quitar el inicio manual, en todo caso si fue eimplementado durante el proyecto y le dejo a continuacion los id.
+  
+
+    // inicialización manual con Firebase usada antes:
+  /*
+  if (Firebase.apps.isEmpty) {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
-        apiKey: "AIzaSyCFXlMcZ9woy5XsSN-cVy7E02utV0GkTI4",
-        authDomain: "appsflutter-cae39.firebaseapp.com",
-        projectId: "appsflutter-cae39",
-        storageBucket: "appsflutter-cae39.appspot.com",
-        messagingSenderId: "193511686223",
-        appId: "1:193511686223:web:d87c5223528359c580ea3a",
+        apiKey: "AIzaSy...",
+        authDomain: "bibliotecadigital-caae0.firebaseapp.com",
+        projectId: "bibliotecadigital-caae0",
+        storageBucket: "bibliotecadigital-caae0.appspot.com",
+        messagingSenderId: "684151998082",
+        appId: "1:684151998082:android:...",
       ),
     );
-  } on FirebaseException catch (e) {
-    if (e.code != 'duplicate-app') rethrow;
+  }
+  */
+
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp();
   }
 
-  runApp(const BibliotecaApp());
+  runApp(const MyApp());
 }
 
-class BibliotecaApp extends StatelessWidget {
-  const BibliotecaApp({super.key});
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Biblioteca Digital',
       debugShowCheckedModeBanner: false,
-      theme: FlexThemeData.light(
-        scheme: FlexScheme.deepOrangeM3,
-        surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-        blendLevel: 7,
-        subThemesData: const FlexSubThemesData(
-          blendOnLevel: 10,
-          blendOnColors: false,
-          useMaterial3Typography: true,
-        ),
-        visualDensity: FlexColorScheme.comfortablePlatformDensity,
-        useMaterial3: true,
-      ),
-      darkTheme: FlexThemeData.dark(
-        scheme: FlexScheme.deepOrangeM3,
-        surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-        blendLevel: 7,
-        subThemesData: const FlexSubThemesData(
-          blendOnLevel: 10,
-          blendOnColors: false,
-          useMaterial3Typography: true,
-        ),
-        visualDensity: FlexColorScheme.comfortablePlatformDensity,
-        useMaterial3: true,
-      ),
+      title: 'BibliotecaGo',
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
+
+      // Siempre partimos en Splash
       home: const SplashScreen(),
     );
   }

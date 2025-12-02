@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'onboarding.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
+import 'login.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -14,58 +17,71 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    _iniciarFlujo();
+  }
 
-    //NAVEGACION ONBOARDING
-    Future.delayed(const Duration(seconds: 2), () {
-      if (!mounted) return;
-      setState(() => _opacity = 0.0);
+  Future<void> _iniciarFlujo() async {
 
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (!mounted) return;
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const OnboardingPage()),
-        );
-      });
+    try {
+      await GoogleSignIn().signOut();
+    } catch (_) {}
+    try {
+      await FirebaseAuth.instance.signOut();
+    } catch (_) {}
+
+    
+    await Future.delayed(const Duration(milliseconds: 300));
+    if (!mounted) return;
+    setState(() {
+      _opacity = 1.0;
     });
+
+    await Future.delayed(const Duration(seconds: 2));
+
+   
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme; 
+    final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       backgroundColor: scheme.primary,
       body: Center(
         child: AnimatedOpacity(
-          duration: const Duration(milliseconds: 500),
           opacity: _opacity,
+          duration: const Duration(milliseconds: 600),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               // ICONO LIBRO
               Container(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: scheme.onPrimary.withValues(alpha: 0.2),
-                  shape: BoxShape.circle,
+                  color: scheme.onPrimary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(24),
                 ),
                 child: Icon(
-                  Icons.book,
-                  size: 80,
+                  Icons.menu_book_rounded,
+                  size: 64,
                   color: scheme.onPrimary,
                 ),
               ),
               const SizedBox(height: 24),
 
-              // NOMBRE
+              // NOMBRE APP
               Text(
                 'BibliotecaGo',
                 style: TextStyle(
-                  fontSize: 32,
+                  fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: scheme.onPrimary,
                   letterSpacing: 1.2,
+                  color: scheme.onPrimary,
                 ),
               ),
               const SizedBox(height: 8),

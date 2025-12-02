@@ -164,7 +164,7 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
           children: [
             const SizedBox(height: 24),
 
-            //IMAGEN LIBRO
+            // IMAGEN LIBRO (AHORA DESDE FIREBASE STORAGE)
             Center(
               child: SizedBox(
                 width: _bookWidth,
@@ -173,18 +173,33 @@ class _PaginaDetalleLibroState extends State<PaginaDetalleLibro> {
                   borderRadius: BorderRadius.circular(_bookRadius),
                   child: Container(
                     color: Colors.grey[300],
-                    child: Image.asset(
-                      imagenUrl,
-                      fit: BoxFit.cover, 
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          color: Colors.grey[300],
-                          child: const Center(
-                            child: Icon(Icons.book, size: 50, color: Colors.grey),
+                    child: imagenUrl.isNotEmpty
+                        ? Image.network(
+                            imagenUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                color: Colors.grey[300],
+                                child: const Center(
+                                  child: Icon(
+                                    Icons.book,
+                                    size: 50,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                        : Container(
+                            color: Colors.grey[300],
+                            child: const Center(
+                              child: Icon(
+                                Icons.book,
+                                size: 50,
+                                color: Colors.grey,
+                              ),
+                            ),
                           ),
-                        );
-                      },
-                    ),
                   ),
                 ),
               ),

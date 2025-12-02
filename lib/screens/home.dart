@@ -8,7 +8,11 @@ import '../services/firebase_service.dart';
 import 'libro_detalle.dart';
 import 'buscar.dart';
 import 'listas.dart';
+import 'login.dart';  
 import '../theme/theme.dart';
+import '../data/portadas_urls.dart';
+
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,66 +28,77 @@ class _HomeScreenState extends State<HomeScreen> {
   static const double _coverWidth = 160;
   static const double _coverHeight = 220;
 
-  // LIBROS DISPO 
+  // LIBROS DISPONIBLES - ahora usando URLs de Storage
   final List<Libro> _librosNuevos = [
-    Libro(
-      id: 'libro_principito',
-      titulo: 'El Principito',
-      autor: 'Antoine de Saint-Exupéry',
-      imagenUrl: 'assets/principito.jpg',
-      calificacion: 5,
-      categorias: ['Arte', 'Infantil'],
-      paginas: 96,
-    ),
-    Libro(
-      id: 'libro_albatros',
-      titulo: 'El albatros negro',
-      autor: 'María Dueñas',
-      imagenUrl: 'assets/albatroz.png',
-      calificacion: 5,
-      categorias: ['Historia', 'Novela'],
-      paginas: 450,
-    ),
-    Libro(
-      id: 'libro_zoo',
-      titulo: 'La muy catastrófica visita al zoo',
-      autor: 'Varios Autores',
-      imagenUrl: 'assets/zoo.webp',
-      calificacion: 5,
-      categorias: ['Infantil', 'Humor'],
-      paginas: 120,
-    ),
-  ];
+  Libro(
+    id: 'libro_principito',
+    titulo: 'El Principito',
+    autor: 'Antoine de Saint-Exupéry',
+    imagenUrl: kUrlPortadaPrincipito,
+    calificacion: 5,
+    categorias: ['Arte', 'Infantil'],
+    paginas: 96,
+  ),
+  Libro(
+    id: 'libro_albatros',
+    titulo: 'El albatros negro',
+    autor: 'María Dueñas',
+    imagenUrl: kUrlPortadaAlbatros,
+    calificacion: 5,
+    categorias: ['Historia', 'Novela'],
+    paginas: 450,
+  ),
+  Libro(
+    id: 'libro_zoo',
+    titulo: 'La muy catastrófica visita al zoo',
+    autor: 'Varios autores',
+    imagenUrl: kUrlPortadaZoo,
+    calificacion: 5,
+    categorias: ['Infantil', 'Humor'],
+    paginas: 120,
+  ),
+];
+
 
   final List<Libro> _librosParaTi = [
-    Libro(
-      id: 'libro_amor',
-      titulo: 'Nuestra Desquiciada historia de amor',
-      autor: 'Sandy Nelson',
-      imagenUrl: 'assets/desquiciada.webp',
-      calificacion: 5,
-      categorias: ['Romance', 'Drama'],
-      paginas: 320,
-    ),
-    Libro(
-      id: 'libro_cosecha',
-      titulo: 'Amanecer en la cosecha',
-      autor: 'Autor Desconocido',
-      imagenUrl: 'assets/amanecer.jpg',
-      calificacion: 5,
-      categorias: ['Fantasía', 'Aventura'],
-      paginas: 280,
-    ),
-    Libro(
-      id: 'libro_aciman',
-      titulo: 'André Aciman',
-      autor: 'André Aciman',
-      imagenUrl: 'assets/romano.jpg',
-      calificacion: 5,
-      categorias: ['Romance', 'Drama'],
-      paginas: 250,
-    ),
-  ];
+  Libro(
+    id: 'libro_desquiciada',
+    titulo: 'Nuestra desquiciada historia de amor',
+    autor: 'Sandy Nelson',
+    imagenUrl: kUrlPortadaDesquiciada,
+    calificacion: 5,
+    categorias: ['Romance', 'Drama'],
+    paginas: 320,
+  ),
+  Libro(
+    id: 'libro_amanecer',
+    titulo: 'Amanecer en la cosecha',
+    autor: 'Autor desconocido',
+    imagenUrl: kUrlPortadaAmanecer,
+    calificacion: 5,
+    categorias: ['Fantasía', 'Aventura'],
+    paginas: 280,
+  ),
+  Libro(
+    id: 'libro_romano',
+    titulo: 'Mi año romano',
+    autor: 'André Aciman',
+    imagenUrl: kUrlPortadaRomano,
+    calificacion: 5,
+    categorias: ['Memorias', 'Romance'],
+    paginas: 250,
+  ),
+  Libro(
+    id: 'libro_emilia',
+    titulo: 'Mi nombre es Emilia del Valle',
+    autor: 'Isabel Allende',
+    imagenUrl: kUrlPortadaEmilia,
+    calificacion: 5,
+    categorias: ['Ficción', 'Latinoamericana'],
+    paginas: 320,
+  ),
+];
+
 
   void _onItemTapped(int index) {
     setState(() {
@@ -95,27 +110,23 @@ class _HomeScreenState extends State<HomeScreen> {
       case 0:
         break;
       case 1:
-        // BUSCAR
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const PaginaBuscar()),
+          MaterialPageRoute(builder: (context) => const BuscarPage()),
         );
         break;
       case 2:
-        // LIBROS LECTURA RAP 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Lectura rápida')),
         );
         break;
       case 3:
-        // LISTAS FAV
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const PaginaListas()),
         );
         break;
       case 4:
-        // PERFIL
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Perfil')),
         );
@@ -124,35 +135,43 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _signOut() async {
-    try {
-      await GoogleSignIn.instance.signOut();
-      await FirebaseAuth.instance.signOut();
+  try {
+    await GoogleSignIn().signOut();
+    await FirebaseAuth.instance.signOut();
 
-      if (!mounted) return;
+    if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sesión cerrada exitosamente')),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al cerrar sesión: $e')),
-      );
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Sesión cerrada exitosamente')),
+    );
+
+    // 👉 volver al Login y limpiar la navegación
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+      (route) => false,
+    );
+  } catch (e) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error al cerrar sesión: $e')),
+    );
   }
+}
 
-  // AGREGAR Y ELIMINAR FAVS 
+
+  // AGREGAR Y ELIMINAR FAVORITOS
   Future<void> _alternarFavorito(Libro libro) async {
     final exitoso = await _servicioFirebase.alternarFavorito(libro);
 
-    if (!mounted) return; 
+    if (!mounted) return;
 
     if (exitoso) {
       final esFav = await _servicioFirebase.esFavorito(libro.id);
-      
-      if (!mounted) return; 
-      
-      ScaffoldMessenger.of(context).showSnackBar( 
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             esFav ? 'Agregado a favoritos' : 'Eliminado de favoritos',
@@ -160,10 +179,42 @@ class _HomeScreenState extends State<HomeScreen> {
           duration: const Duration(seconds: 2),
           backgroundColor: esFav
               ? AppTheme.azulSecundario
-              : Theme.of(context).colorScheme.error, 
+              : Theme.of(context).colorScheme.error,
         ),
       );
       setState(() {});
+    }
+  }
+
+  // 🔍 Decide si carga desde red (Storage) o desde assets
+  Widget _buildBookImage(Libro libro) {
+    final isNetwork = libro.imagenUrl.startsWith('http');
+
+    final fallback = Container(
+      color: Colors.grey[300],
+      child: const Center(
+        child: Icon(Icons.book, size: 50, color: Colors.grey),
+      ),
+    );
+
+    if (isNetwork) {
+      return Image.network(
+        libro.imagenUrl,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        alignment: Alignment.center,
+        errorBuilder: (context, error, stackTrace) => fallback,
+      );
+    } else {
+      return Image.asset(
+        libro.imagenUrl,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        alignment: Alignment.center,
+        errorBuilder: (context, error, stackTrace) => fallback,
+      );
     }
   }
 
@@ -197,7 +248,7 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const PaginaBuscar()),
+                MaterialPageRoute(builder: (context) => const BuscarPage()),
               );
             },
           ),
@@ -214,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             const SizedBox(height: 20),
 
-            // RETO LECTOR 
+            // RETO LECTOR
             CarouselSlider(
               options: CarouselOptions(
                 height: 200,
@@ -311,7 +362,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           TextButton(
             onPressed: () {
-              // VER MAS 
+              // VER MÁS
             },
             child: Text(
               'Ver más',
@@ -335,7 +386,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: Stack(
         children: [
-          // Flechas izquierda
           Positioned(
             left: 10,
             top: 0,
@@ -345,8 +395,6 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () {},
             ),
           ),
-
-          // CONTENIDO CENTRADO (con ajuste anti-overflow)
           Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -374,7 +422,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Icon(
                       Icons.keyboard,
                       size: 44,
-                      color: Colors.white.withValues(alpha: 0.9), 
+                      color: Colors.white.withValues(alpha: 0.9),
                     ),
                     const SizedBox(height: 8),
                     const Text(
@@ -397,7 +445,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-
           Positioned(
             right: 10,
             top: 0,
@@ -421,10 +468,8 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Stack(
             children: [
-              // IMAGEN LIBRO 
               GestureDetector(
                 onTap: () {
-                  // NAVEGACION PANTALLA DE LIBRO DETALLE
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -451,7 +496,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(8),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.2), 
+                        color: Colors.black.withValues(alpha: 0.2),
                         blurRadius: 4,
                         offset: const Offset(0, 2),
                       ),
@@ -463,26 +508,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: double.infinity,
                       height: double.infinity,
                       color: Colors.grey[200],
-                      child: Image.asset(
-                        libro.imagenUrl,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: double.infinity,
-                        alignment: Alignment.center,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Colors.grey[300],
-                            child: const Center(
-                              child: Icon(Icons.book, size: 50, color: Colors.grey),
-                            ),
-                          );
-                        },
-                      ),
+                      child: _buildBookImage(libro),
                     ),
                   ),
                 ),
               ),
-              // FAV BOTON
               Positioned(
                 top: 8,
                 right: 8,
@@ -495,11 +525,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.85), 
+                          color: Colors.white.withValues(alpha: 0.85),
                           borderRadius: BorderRadius.circular(6),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.15), 
+                              color: Colors.black.withValues(alpha: 0.15),
                               blurRadius: 4,
                               offset: const Offset(0, 2),
                             ),
@@ -517,7 +547,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-
           const SizedBox(height: 6),
           Text(
             libro.titulo,
@@ -529,10 +558,7 @@ class _HomeScreenState extends State<HomeScreen> {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
-
           const SizedBox(height: 4),
-
-          // ESTRELLAS
           Row(
             children: List.generate(
               libro.calificacion.toInt(),

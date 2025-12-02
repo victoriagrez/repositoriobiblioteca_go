@@ -1,16 +1,109 @@
 import 'package:flutter/material.dart';
-import '../theme/theme.dart'; 
+import '../theme/theme.dart';
+import '../data/portadas_urls.dart'; 
 
-class PaginaBuscar extends StatefulWidget {
-  const PaginaBuscar({super.key});
+class BuscarPage extends StatefulWidget {
+  const BuscarPage({super.key});
 
   @override
-  State<PaginaBuscar> createState() => _PaginaBuscarState();
+  State<BuscarPage> createState() => _BuscarPageState();
 }
 
-class _PaginaBuscarState extends State<PaginaBuscar> {
+class _BuscarPageState extends State<BuscarPage> {
   final TextEditingController _searchController = TextEditingController();
-  int _selectedIndex = 1; 
+  int _selectedIndex = 1; // "Buscar"
+  String _selectedFilter = 'No ficción';
+
+  // Filtros
+  final List<String> _filters = [
+    'Ficción',
+    'Clásicos',
+    'No ficción',
+    'Historia',
+  ];
+
+  // Libros de ejemplo usando URLs de Storage
+  final List<Map<String, dynamic>> _books = [
+  {
+    'title': 'Mi año romano',
+    'author': 'André Aciman',
+    'imageUrl': kUrlPortadaRomano,
+    'rating': 5,
+  },
+  {
+    'title': 'Mi nombre es\nEmilia del Valle',
+    'author': 'Isabel Allende',
+    'imageUrl': kUrlPortadaEmilia,
+    'rating': 5,
+  },
+  {
+    'title': 'Amanecer en\nla cosecha',
+    'author': 'Autor desconocido',
+    'imageUrl': kUrlPortadaAmanecer,
+    'rating': 5,
+  },
+  {
+    'title': 'La muy catastrófica\nvisita al zoo',
+    'author': 'Joel Dicker',
+    'imageUrl': kUrlPortadaZoo,
+    'rating': 5,
+  },
+  {
+    'title': 'El albatros\nnegro',
+    'author': 'María Oruña',
+    'imageUrl': kUrlPortadaAlbatros,
+    'rating': 5,
+  },
+  {
+    'title': 'Nuestra desquiciada\nhistoria de amor',
+    'author': 'Sandy Nelson',
+    'imageUrl': kUrlPortadaDesquiciada,
+    'rating': 5,
+  },
+  {
+    'title': 'Cartas que nunca\nescribí',
+    'author': 'Autor ficticio',
+    'imageUrl': kUrlPortadaLetters,
+    'rating': 4,
+  },
+  {
+    'title': 'Arte y creatividad',
+    'author': 'Varios autores',
+    'imageUrl': kUrlPortadaArt,
+    'rating': 4,
+  },
+  {
+    'title': 'Historia del diseño',
+    'author': 'Autor ficticio',
+    'imageUrl': kUrlPortadaDesign,
+    'rating': 4,
+  },
+  {
+    'title': 'Volvemos a empezar',
+    'author': 'Autor ficticio',
+    'imageUrl': kUrlPortadaVolvemos,
+    'rating': 4,
+  },
+  {
+    'title': 'Woman',
+    'author': 'Autor ficticio',
+    'imageUrl': kUrlPortadaWoman,
+    'rating': 4,
+  },
+  {
+    'title': 'El Principito',
+    'author': 'Antoine de Saint-Exupéry',
+    'imageUrl': kUrlPortadaPrincipito,
+    'rating': 5,
+  },
+];
+
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.text = 'No ficción';
+  }
 
   @override
   void dispose() {
@@ -24,7 +117,7 @@ class _PaginaBuscarState extends State<PaginaBuscar> {
     final primary = scheme.primary;
     final onPrimary = scheme.onPrimary;
     final surface = scheme.surface;
-    final surfaceVariant = scheme.surfaceContainerHighest;
+    final surfaceHighest = scheme.surfaceContainerHighest;
 
     return Scaffold(
       backgroundColor: surface,
@@ -54,14 +147,13 @@ class _PaginaBuscarState extends State<PaginaBuscar> {
         children: [
           const SizedBox(height: 16),
 
+          // Botón "Ver catálogo completo"
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                 
-                },
+                onPressed: () {},
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primary,
                   foregroundColor: onPrimary,
@@ -71,9 +163,9 @@ class _PaginaBuscarState extends State<PaginaBuscar> {
                   ),
                   elevation: 0,
                 ),
-                child: Row(
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Text(
                       'Ver catálogo completo',
                       style: TextStyle(
@@ -89,9 +181,9 @@ class _PaginaBuscarState extends State<PaginaBuscar> {
             ),
           ),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
 
-          // TITULO BUSQUEDA
+          // Título
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.0),
             child: Text(
@@ -104,32 +196,32 @@ class _PaginaBuscarState extends State<PaginaBuscar> {
             ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
-          // BARRA BUSQUEDA
+          // Barra de búsqueda
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Container(
               decoration: BoxDecoration(
-                color: surface, 
+                color: surface,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: surfaceVariant,
+                  color: surfaceHighest, // ✅ en vez de surfaceVariant
                   width: 1,
                 ),
               ),
               child: TextField(
                 controller: _searchController,
-                cursorColor: AppTheme.azulSecundario, 
+                cursorColor: AppTheme.azulSecundario,
                 decoration: InputDecoration(
                   hintText: 'Buscar',
                   hintStyle: TextStyle(
                     color: Colors.grey[600],
                     fontSize: 16,
                   ),
-                  prefixIcon: Icon(
+                  suffixIcon: Icon(
                     Icons.search,
-                    color: primary,
+                    color: scheme.outline,
                     size: 24,
                   ),
                   border: InputBorder.none,
@@ -139,58 +231,130 @@ class _PaginaBuscarState extends State<PaginaBuscar> {
                   ),
                 ),
                 onSubmitted: (value) {
-              
+                  setState(() {
+                    _selectedFilter = value;
+                  });
                 },
               ),
             ),
           ),
 
-          //RESULTADOS
-          Expanded(
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.search,
-                    size: 80,
-                    color: Colors.grey[300],
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Comienza a buscar libros',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[600],
+          const SizedBox(height: 16),
+
+          // Filtros
+          SizedBox(
+            height: 40,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: _filters.length,
+              itemBuilder: (context, index) {
+                final filter = _filters[index];
+                final isSelected = filter == _selectedFilter;
+
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: FilterChip(
+                    label: Text(filter),
+                    selected: isSelected,
+                    onSelected: (selected) {
+                      setState(() {
+                        _selectedFilter = filter;
+                        _searchController.text = filter;
+                      });
+                    },
+                    backgroundColor: surface,
+                    selectedColor: primary,
+                    labelStyle: TextStyle(
+                      color: isSelected ? onPrimary : scheme.onSurface,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(
+                        color: isSelected
+                            ? primary
+                            : AppTheme.azulSecundario,
+                        width: 1.5,
+                      ),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
                     ),
                   ),
-                ],
+                );
+              },
+            ),
+          ),
+
+          const SizedBox(height: 24),
+
+          // Título sección
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  _selectedFilter,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    'Ver más',
+                    style: TextStyle(
+                      color: primary,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          // Grid de libros
+          Expanded(
+            child: GridView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                childAspectRatio: 0.55,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 16,
               ),
+              itemCount: _books.length,
+              itemBuilder: (context, index) {
+                return _buildBookCard(_books[index], scheme);
+              },
             ),
           ),
         ],
       ),
 
-      //BOTTOMBAR
+      // Bottom bar
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: (index) {
-          setState(() => _selectedIndex = index);
-
+          setState(() {
+            _selectedIndex = index;
+          });
           if (index == 0) {
-            Navigator.pop(context); 
+            Navigator.pop(context);
           }
-    
         },
         type: BottomNavigationBarType.fixed,
         selectedItemColor: primary,
-        unselectedItemColor: Colors.grey,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
+        unselectedItemColor: scheme.outlineVariant,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
+            icon: Icon(Icons.home),
             label: 'Inicio',
           ),
           BottomNavigationBarItem(
@@ -198,21 +362,106 @@ class _PaginaBuscarState extends State<PaginaBuscar> {
             label: 'Buscar',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.book_outlined),
-            activeIcon: Icon(Icons.book),
+            icon: Icon(Icons.book),
             label: '',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.list),
+            icon: Icon(Icons.favorite_border),
             label: 'Listas',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
             label: 'Perfil',
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildBookCard(
+    Map<String, dynamic> book,
+    ColorScheme scheme,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Imagen (SIEMPRE de red)
+        Expanded(
+          child: Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: scheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    book['imageUrl'],
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: scheme.surfaceContainerHighest,
+                        child: Icon(
+                          Icons.book,
+                          size: 40,
+                          color: scheme.outline,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              // Marcador
+              Positioned(
+                top: 6,
+                right: 6,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.azulSecundario,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Icon(
+                    Icons.bookmark,
+                    color: Colors.white,
+                    size: 16,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          book['title'].split('\n')[0],
+          style: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+          ),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 2),
+        Row(
+          children: List.generate(
+            book['rating'] as int,
+            (index) => const Icon(
+              Icons.star,
+              color: AppTheme.amarilloEstrella,
+              size: 12,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
