@@ -1,5 +1,6 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   static const Color naranjaPrimario = Color(0xFFEB5F28); 
@@ -37,6 +38,7 @@ class AppTheme {
     useMaterial3: true,
     scaffoldBackground: fondoClaro,
   ).copyWith(
+    textTheme: GoogleFonts.poppinsTextTheme(),     
     appBarTheme: const AppBarTheme(
       backgroundColor: naranjaPrimario,
       foregroundColor: Colors.white,
@@ -44,8 +46,8 @@ class AppTheme {
       centerTitle: false,
       iconTheme: IconThemeData(color: Colors.white),
       actionsIconTheme: IconThemeData(color: Colors.white),
-      surfaceTintColor: Colors.transparent, 
-      scrolledUnderElevation: 0,           
+      surfaceTintColor: Colors.transparent,
+      scrolledUnderElevation: 0,
     ),
     colorScheme: const ColorScheme.light(
       primary: naranjaPrimario,
@@ -82,6 +84,7 @@ class AppTheme {
     visualDensity: FlexColorScheme.comfortablePlatformDensity,
     useMaterial3: true,
   ).copyWith(
+    textTheme: GoogleFonts.poppinsTextTheme(),   
     appBarTheme: const AppBarTheme(
       backgroundColor: naranjaPrimario,
       foregroundColor: Colors.white,

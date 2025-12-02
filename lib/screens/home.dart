@@ -8,6 +8,7 @@ import '../services/firebase_service.dart';
 import 'libro_detalle.dart';
 import 'buscar.dart';
 import 'listas.dart';
+import 'perfil.dart'; // 👈 Agregamos import de perfil
 import 'login.dart';  
 import '../theme/theme.dart';
 import '../data/portadas_urls.dart';
@@ -101,35 +102,55 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
   void _onItemTapped(int index) {
+    if (index == _selectedIndex) return; // Ya estamos en esta página
+
     setState(() {
       _selectedIndex = index;
     });
 
-    // NAV
+    // Navegación mejorada
     switch (index) {
       case 0:
+        // Ya estamos en Home, no hacer nada
         break;
       case 1:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const BuscarPage()),
-        );
+        ).then((_) {
+          // Resetear índice cuando regrese
+          setState(() {
+            _selectedIndex = 0;
+          });
+        });
         break;
       case 2:
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Lectura rápida')),
         );
+        setState(() {
+          _selectedIndex = 0; // Resetear
+        });
         break;
       case 3:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => const PaginaListas()),
-        );
+        ).then((_) {
+          setState(() {
+            _selectedIndex = 0;
+          });
+        });
         break;
       case 4:
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Perfil')),
-        );
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const PerfilPage()),
+        ).then((_) {
+          setState(() {
+            _selectedIndex = 0;
+          });
+        });
         break;
     }
   }
@@ -145,7 +166,6 @@ class _HomeScreenState extends State<HomeScreen> {
       const SnackBar(content: Text('Sesión cerrada exitosamente')),
     );
 
-    // 👉 volver al Login y limpiar la navegación
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -186,7 +206,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // 🔍 Decide si carga desde red (Storage) o desde assets
   Widget _buildBookImage(Libro libro) {
     final isNetwork = libro.imagenUrl.startsWith('http');
 

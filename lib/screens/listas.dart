@@ -20,7 +20,6 @@ class _PaginaListasState extends State<PaginaListas> {
     super.dispose();
   }
 
-  // CRUD: ELIMINAR DE FAVS
   Future<void> _eliminarDeFavoritos(String libroId) async {
     final resultado = await showDialog<bool>(
       context: context,
@@ -28,10 +27,7 @@ class _PaginaListasState extends State<PaginaListas> {
         title: const Text('Eliminar de favoritos'),
         content: const Text('¿Estás segura que quieres eliminar este libro de tus favoritos?'),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
-          ),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
@@ -42,30 +38,14 @@ class _PaginaListasState extends State<PaginaListas> {
     );
 
     if (resultado == true) {
-      try {
-        await FirebaseFirestore.instance
-            .collection('mis_favoritos')
-            .doc(libroId)
-            .delete();
-            
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Eliminado de favoritos'),
-              backgroundColor: Theme.of(context).colorScheme.secondary,
-            ),
-          );
-        }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error al eliminar: $e'),
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-          );
-        }
-      }
+      await FirebaseFirestore.instance.collection('mis_favoritos').doc(libroId).delete();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Eliminado de favoritos'),
+          backgroundColor: Theme.of(context).colorScheme.secondary,
+        ),
+      );
     }
   }
 
@@ -81,31 +61,20 @@ class _PaginaListasState extends State<PaginaListas> {
           children: [
             Icon(Icons.bookmark, color: Colors.white),
             SizedBox(width: 8),
-            Text(
-              'Libros Guardados',
-              style: TextStyle(color: Colors.white),
-            ),
+            Text('Libros Guardados', style: TextStyle(color: Colors.white)),
           ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search, color: Colors.white),
-            onPressed: () {},
-          ),
+          IconButton(icon: const Icon(Icons.search, color: Colors.white), onPressed: () {}),
         ],
       ),
       body: Column(
         children: [
-          //SEARCHBAR
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
               controller: _controladorBusqueda,
-              onChanged: (valor) {
-                setState(() {
-                  _textoBusqueda = valor;
-                });
-              },
+              onChanged: (v) => setState(() => _textoBusqueda = v),
               cursorColor: AppTheme.azulSecundario,
               decoration: InputDecoration(
                 hintText: 'Buscar',
@@ -117,17 +86,12 @@ class _PaginaListasState extends State<PaginaListas> {
                         icon: const Icon(Icons.clear),
                         color: AppTheme.azulSecundario,
                         onPressed: () {
-                          setState(() {
-                            _controladorBusqueda.clear();
-                            _textoBusqueda = '';
-                          });
+                          _controladorBusqueda.clear();
+                          setState(() => _textoBusqueda = '');
                         },
                       )
                     : null,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide.none,
-                ),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(30), borderSide: BorderSide.none),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30),
                   borderSide: const BorderSide(color: AppTheme.azulSecundario, width: 2),
@@ -135,71 +99,31 @@ class _PaginaListasState extends State<PaginaListas> {
               ),
             ),
           ),
-          // CRUD LISTA FAVORITOS :)
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('mis_favoritos')
-                  .snapshots(),
+              stream: FirebaseFirestore.instance.collection('mis_favoritos').snapshots(),
               builder: (context, snapshot) {
-                // Mientras carga
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: CircularProgressIndicator(
-                      color: scheme.primary,
-                    ),
-                  );
+                  return Center(child: CircularProgressIndicator(color: scheme.primary));
                 }
 
-                //ERROR?
                 if (snapshot.hasError) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          size: 60,
-                          color: scheme.error,
-                        ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'Error al cargar favoritos',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  );
+                  return const Center(child: Text('Error al cargar favoritos', style: TextStyle(color: Colors.grey)));
                 }
 
-                //NO LIBROS? 
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(
-                          Icons.bookmark_border,
-                          size: 80,
-                          color: Colors.grey[400],
-                        ),
+                        Icon(Icons.bookmark_border, size: 80, color: Colors.grey[400]),
                         const SizedBox(height: 16),
-                        Text(
-                          'No tienes libros guardados',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.grey[600],
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+                        Text('No tienes libros guardados',
+                            style: TextStyle(fontSize: 18, color: Colors.grey[600], fontWeight: FontWeight.w500)),
                         const SizedBox(height: 8),
                         Text(
                           'Agrega libros a favoritos desde la pantalla principal',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[500],
-                          ),
+                          style: TextStyle(fontSize: 14, color: Colors.grey[500]),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -207,39 +131,25 @@ class _PaginaListasState extends State<PaginaListas> {
                   );
                 }
 
-                //AGREGAR FILTRO 
                 final docs = snapshot.data!.docs.where((doc) {
                   final data = doc.data() as Map<String, dynamic>;
-                  final titulo = (data['titulo'] ?? '').toString().toLowerCase();
-                  final autor = (data['autor'] ?? '').toString().toLowerCase();
-                  final busqueda = _textoBusqueda.toLowerCase();
-                  return titulo.contains(busqueda) || autor.contains(busqueda);
+                  final titulo = (data['titulo'] ?? '').toLowerCase();
+                  final autor = (data['autor'] ?? '').toLowerCase();
+                  final q = _textoBusqueda.toLowerCase();
+                  return titulo.contains(q) || autor.contains(q);
                 }).toList();
 
-                if (docs.isEmpty && _textoBusqueda.isNotEmpty) {
+                if (docs.isEmpty) {
                   return Center(
-                    child: Text(
-                      'No se encontraron libros con "$_textoBusqueda"',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
-                      ),
-                    ),
+                    child: Text('No se encontraron libros con "$_textoBusqueda"',
+                        style: const TextStyle(fontSize: 16, color: Colors.grey)),
                   );
                 }
 
-                //LIBROS
                 return ListView(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   children: [
-                    //GUARDADOS
-                    const Text(
-                      'Guardados',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    const Text('Guardados', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 12),
                     ...docs.map((doc) {
                       final data = doc.data() as Map<String, dynamic>;
@@ -256,26 +166,21 @@ class _PaginaListasState extends State<PaginaListas> {
   }
 
   Widget _construirTarjetaLibro(String docId, Map<String, dynamic> data) {
-    final titulo = data['titulo'] ?? 'Sin título';
-    final autor = data['autor'] ?? 'Autor desconocido';
+    final titulo = data['titulo'] ?? '';
+    final autor = data['autor'] ?? '';
     final imagenUrl = data['imagenUrl'] ?? '';
     final calificacion = (data['calificacion'] ?? 0).toInt();
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => PaginaDetalleLibro(
-                libroId: docId,
-                datosLibro: data,
-              ),
+              builder: (_) => PaginaDetalleLibro(libroId: docId, datosLibro: data),
             ),
           );
         },
@@ -285,72 +190,50 @@ class _PaginaListasState extends State<PaginaListas> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              //IMAGEN LIBRO
               Container(
                 width: 60,
                 height: 90,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
-                    BoxShadow(
-                      color:Colors.grey.withValues(alpha: 0.3),
-                      spreadRadius: 1,
-                      blurRadius: 3,
-                    ),
+                    BoxShadow(color: Colors.grey.withValues(alpha: 0.3), spreadRadius: 1, blurRadius: 3),
                   ],
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.asset(
+                  child: Image.network(
                     imagenUrl,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: Colors.grey[300],
-                        child: const Icon(Icons.book, color: Colors.grey),
-                      );
-                    },
+                    errorBuilder: (_, __, ___) => Container(
+                      color: Colors.grey[300],
+                      child: const Icon(Icons.book, color: Colors.grey),
+                    ),
                   ),
                 ),
               ),
               const SizedBox(width: 12),
-              //INFO LIBRO
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      titulo,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    Text(titulo,
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis),
                     const SizedBox(height: 4),
-                    Text(
-                      autor,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
-                    ),
+                    Text(autor, style: const TextStyle(fontSize: 14, color: Colors.grey)),
                     const SizedBox(height: 8),
-                    //RATING ESTRELLITA :)
                     Row(
-                      children: List.generate(5, (index) {
-                        return Icon(
-                          index < calificacion
-                              ? Icons.star
-                              : Icons.star_border,
+                      children: List.generate(
+                        5,
+                        (i) => Icon(
+                          i < calificacion ? Icons.star : Icons.star_border,
                           color: AppTheme.amarilloEstrella,
                           size: 16,
-                        );
-                      }),
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 8),
-                    //BARRA DE PROGRESO SIMULADA 
                     ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: LinearProgressIndicator(
@@ -361,17 +244,10 @@ class _PaginaListasState extends State<PaginaListas> {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      '68%',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey[600],
-                      ),
-                    ),
+                    Text('68%', style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                   ],
                 ),
               ),
-              //ELIMINAR (BOTON) 
               IconButton(
                 icon: Icon(Icons.delete_outline, color: Theme.of(context).colorScheme.error),
                 onPressed: () => _eliminarDeFavoritos(docId),

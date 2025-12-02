@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import '../theme/theme.dart';
-import '../data/portadas_urls.dart'; 
+import '../data/portadas_urls.dart';
+import '../models/libro.dart';
+import '../services/firebase_service.dart';
+import 'libro_detalle.dart';
+import 'listas.dart';
+import 'perfil.dart';
 
 class BuscarPage extends StatefulWidget {
   const BuscarPage({super.key});
@@ -11,7 +16,9 @@ class BuscarPage extends StatefulWidget {
 
 class _BuscarPageState extends State<BuscarPage> {
   final TextEditingController _searchController = TextEditingController();
-  int _selectedIndex = 1; // "Buscar"
+  final ServicioFirebase _servicioFirebase = ServicioFirebase(); // 💙 IGUAL QUE HOME
+
+  int _selectedIndex = 1;
   String _selectedFilter = 'No ficción';
 
   // Filtros
@@ -22,82 +29,117 @@ class _BuscarPageState extends State<BuscarPage> {
     'Historia',
   ];
 
-  // Libros de ejemplo usando URLs de Storage
-  final List<Map<String, dynamic>> _books = [
-  {
-    'title': 'Mi año romano',
-    'author': 'André Aciman',
-    'imageUrl': kUrlPortadaRomano,
-    'rating': 5,
-  },
-  {
-    'title': 'Mi nombre es\nEmilia del Valle',
-    'author': 'Isabel Allende',
-    'imageUrl': kUrlPortadaEmilia,
-    'rating': 5,
-  },
-  {
-    'title': 'Amanecer en\nla cosecha',
-    'author': 'Autor desconocido',
-    'imageUrl': kUrlPortadaAmanecer,
-    'rating': 5,
-  },
-  {
-    'title': 'La muy catastrófica\nvisita al zoo',
-    'author': 'Joel Dicker',
-    'imageUrl': kUrlPortadaZoo,
-    'rating': 5,
-  },
-  {
-    'title': 'El albatros\nnegro',
-    'author': 'María Oruña',
-    'imageUrl': kUrlPortadaAlbatros,
-    'rating': 5,
-  },
-  {
-    'title': 'Nuestra desquiciada\nhistoria de amor',
-    'author': 'Sandy Nelson',
-    'imageUrl': kUrlPortadaDesquiciada,
-    'rating': 5,
-  },
-  {
-    'title': 'Cartas que nunca\nescribí',
-    'author': 'Autor ficticio',
-    'imageUrl': kUrlPortadaLetters,
-    'rating': 4,
-  },
-  {
-    'title': 'Arte y creatividad',
-    'author': 'Varios autores',
-    'imageUrl': kUrlPortadaArt,
-    'rating': 4,
-  },
-  {
-    'title': 'Historia del diseño',
-    'author': 'Autor ficticio',
-    'imageUrl': kUrlPortadaDesign,
-    'rating': 4,
-  },
-  {
-    'title': 'Volvemos a empezar',
-    'author': 'Autor ficticio',
-    'imageUrl': kUrlPortadaVolvemos,
-    'rating': 4,
-  },
-  {
-    'title': 'Woman',
-    'author': 'Autor ficticio',
-    'imageUrl': kUrlPortadaWoman,
-    'rating': 4,
-  },
-  {
-    'title': 'El Principito',
-    'author': 'Antoine de Saint-Exupéry',
-    'imageUrl': kUrlPortadaPrincipito,
-    'rating': 5,
-  },
-];
-
+  // CONVERTIMOS tus libros “Map” a modelo Libro (MISMO QUE HOME)
+  final List<Libro> _books = [
+    Libro(
+      id: 'libro_romano',
+      titulo: 'Mi año romano',
+      autor: 'André Aciman',
+      imagenUrl: kUrlPortadaRomano,
+      calificacion: 5,
+      categorias: ['Ficción'],
+      paginas: 250,
+    ),
+    Libro(
+      id: 'libro_emilia',
+      titulo: 'Mi nombre es Emilia del Valle',
+      autor: 'Isabel Allende',
+      imagenUrl: kUrlPortadaEmilia,
+      calificacion: 5,
+      categorias: ['Ficción'],
+      paginas: 320,
+    ),
+    Libro(
+      id: 'libro_amanecer',
+      titulo: 'Amanecer en la cosecha',
+      autor: 'Autor desconocido',
+      imagenUrl: kUrlPortadaAmanecer,
+      calificacion: 5,
+      categorias: ['Ficción'],
+      paginas: 280,
+    ),
+    Libro(
+      id: 'libro_zoo',
+      titulo: 'La muy catastrófica visita al zoo',
+      autor: 'Joel Dicker',
+      imagenUrl: kUrlPortadaZoo,
+      calificacion: 5,
+      categorias: ['Infantil'],
+      paginas: 120,
+    ),
+    Libro(
+      id: 'libro_albatros',
+      titulo: 'El albatros negro',
+      autor: 'María Oruña',
+      imagenUrl: kUrlPortadaAlbatros,
+      calificacion: 5,
+      categorias: ['Novela'],
+      paginas: 450,
+    ),
+    Libro(
+      id: 'libro_desquiciada',
+      titulo: 'Nuestra desquiciada historia de amor',
+      autor: 'Sandy Nelson',
+      imagenUrl: kUrlPortadaDesquiciada,
+      calificacion: 5,
+      categorias: ['Romance'],
+      paginas: 320,
+    ),
+    Libro(
+      id: 'libro_letters',
+      titulo: 'Cartas que nunca escribí',
+      autor: 'Autor ficticio',
+      imagenUrl: kUrlPortadaLetters,
+      calificacion: 4,
+      categorias: ['Drama'],
+      paginas: 200,
+    ),
+    Libro(
+      id: 'libro_art',
+      titulo: 'Arte y creatividad',
+      autor: 'Varios autores',
+      imagenUrl: kUrlPortadaArt,
+      calificacion: 4,
+      categorias: ['Arte'],
+      paginas: 180,
+    ),
+    Libro(
+      id: 'libro_design',
+      titulo: 'Historia del diseño',
+      autor: 'Autor ficticio',
+      imagenUrl: kUrlPortadaDesign,
+      calificacion: 4,
+      categorias: ['Diseño'],
+      paginas: 160,
+    ),
+    Libro(
+      id: 'libro_volvemos',
+      titulo: 'Volvemos a empezar',
+      autor: 'Autor ficticio',
+      imagenUrl: kUrlPortadaVolvemos,
+      calificacion: 4,
+      categorias: ['Ficción'],
+      paginas: 300,
+    ),
+    Libro(
+      id: 'libro_woman',
+      titulo: 'Woman',
+      autor: 'Autor ficticio',
+      imagenUrl: kUrlPortadaWoman,
+      calificacion: 4,
+      categorias: ['Arte'],
+      paginas: 200,
+    ),
+    Libro(
+      id: 'libro_principito',
+      titulo: 'El Principito',
+      autor: 'Antoine de Saint-Exupéry',
+      imagenUrl: kUrlPortadaPrincipito,
+      calificacion: 5,
+      categorias: ['Infantil'],
+      paginas: 96,
+    ),
+  ];
 
   @override
   void initState() {
@@ -111,43 +153,82 @@ class _BuscarPageState extends State<BuscarPage> {
     super.dispose();
   }
 
+  // ❤️ IGUAL QUE HOME.DART
+  Future<void> _alternarFavorito(Libro libro) async {
+    final exitoso = await _servicioFirebase.alternarFavorito(libro);
+
+    if (!mounted) return;
+
+    if (exitoso) {
+      final esFav = await _servicioFirebase.esFavorito(libro.id);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              Text(esFav ? 'Agregado a favoritos' : 'Eliminado de favoritos'),
+          duration: const Duration(seconds: 2),
+          backgroundColor:
+              esFav ? AppTheme.azulSecundario : Theme.of(context).colorScheme.error,
+        ),
+      );
+
+      setState(() {});
+    }
+  }
+
+  void _onItemTapped(int index) {
+    if (index == _selectedIndex) return;
+
+    setState(() => _selectedIndex = index);
+
+    switch (index) {
+      case 0:
+        Navigator.pop(context);
+        break;
+      case 3:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const PaginaListas()),
+        );
+        break;
+      case 4:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const PerfilPage()),
+        );
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final primary = scheme.primary;
-    final onPrimary = scheme.onPrimary;
-    final surface = scheme.surface;
-    final surfaceHighest = scheme.surfaceContainerHighest;
 
     return Scaffold(
-      backgroundColor: surface,
+      backgroundColor: scheme.surface,
       appBar: AppBar(
-        backgroundColor: primary,
+        backgroundColor: scheme.primary,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: onPrimary),
+          icon: Icon(Icons.arrow_back, color: scheme.onPrimary),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Buscar',
           style: TextStyle(
-            color: onPrimary,
+            color: scheme.onPrimary,
             fontSize: 20,
             fontWeight: FontWeight.w500,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.menu, color: onPrimary),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 16),
 
-          // Botón "Ver catálogo completo"
+          // Botón catálogo
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: SizedBox(
@@ -155,13 +236,12 @@ class _BuscarPageState extends State<BuscarPage> {
               child: ElevatedButton(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primary,
-                  foregroundColor: onPrimary,
+                  backgroundColor: scheme.primary,
+                  foregroundColor: scheme.onPrimary,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(25),
                   ),
-                  elevation: 0,
                 ),
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -201,125 +281,22 @@ class _BuscarPageState extends State<BuscarPage> {
           // Barra de búsqueda
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: surface,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: surfaceHighest, // ✅ en vez de surfaceVariant
-                  width: 1,
-                ),
-              ),
-              child: TextField(
-                controller: _searchController,
-                cursorColor: AppTheme.azulSecundario,
-                decoration: InputDecoration(
-                  hintText: 'Buscar',
-                  hintStyle: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 16,
-                  ),
-                  suffixIcon: Icon(
-                    Icons.search,
-                    color: scheme.outline,
-                    size: 24,
-                  ),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                ),
-                onSubmitted: (value) {
-                  setState(() {
-                    _selectedFilter = value;
-                  });
-                },
-              ),
-            ),
+            child: _buildSearchBar(scheme),
           ),
 
           const SizedBox(height: 16),
 
           // Filtros
-          SizedBox(
-            height: 40,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _filters.length,
-              itemBuilder: (context, index) {
-                final filter = _filters[index];
-                final isSelected = filter == _selectedFilter;
-
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    label: Text(filter),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      setState(() {
-                        _selectedFilter = filter;
-                        _searchController.text = filter;
-                      });
-                    },
-                    backgroundColor: surface,
-                    selectedColor: primary,
-                    labelStyle: TextStyle(
-                      color: isSelected ? onPrimary : scheme.onSurface,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      side: BorderSide(
-                        color: isSelected
-                            ? primary
-                            : AppTheme.azulSecundario,
-                        width: 1.5,
-                      ),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
+          _buildFilters(scheme),
 
           const SizedBox(height: 24),
 
           // Título sección
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  _selectedFilter,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    'Ver más',
-                    style: TextStyle(
-                      color: primary,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          _buildSectionTitle(scheme),
 
           const SizedBox(height: 16),
 
-          // Grid de libros
+          // GRID
           Expanded(
             child: GridView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -338,128 +315,278 @@ class _BuscarPageState extends State<BuscarPage> {
         ],
       ),
 
-      // Bottom bar
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-          if (index == 0) {
-            Navigator.pop(context);
-          }
+      bottomNavigationBar: _buildBottomBar(scheme),
+    );
+  }
+
+  Widget _buildSearchBar(ColorScheme scheme) {
+    return Container(
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: scheme.surfaceContainerHighest,
+          width: 1,
+        ),
+      ),
+      child: TextField(
+        controller: _searchController,
+        cursorColor: AppTheme.azulSecundario,
+        decoration: InputDecoration(
+          hintText: 'Buscar',
+          hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 16,
+          ),
+          suffixIcon: Icon(
+            Icons.search,
+            color: scheme.outline,
+            size: 24,
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
+        ),
+        onSubmitted: (value) {
+          setState(() => _selectedFilter = value);
         },
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: primary,
-        unselectedItemColor: scheme.outlineVariant,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Inicio',
+      ),
+    );
+  }
+
+  Widget _buildFilters(ColorScheme scheme) {
+    return SizedBox(
+      height: 40,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: _filters.length,
+        itemBuilder: (context, index) {
+          final filter = _filters[index];
+          final isSelected = filter == _selectedFilter;
+
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: FilterChip(
+              label: Text(filter),
+              selected: isSelected,
+              onSelected: (_) {
+                setState(() {
+                  _selectedFilter = filter;
+                  _searchController.text = filter;
+                });
+              },
+              backgroundColor: scheme.surface,
+              selectedColor: scheme.primary,
+              labelStyle: TextStyle(
+                color: isSelected ? scheme.onPrimary : scheme.onSurface,
+                fontWeight: FontWeight.w500,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(
+                  color: isSelected
+                      ? scheme.primary
+                      : AppTheme.azulSecundario,
+                  width: 1.5,
+                ),
+              ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(ColorScheme scheme) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            _selectedFilter,
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Buscar',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.book),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_border),
-            label: 'Listas',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: 'Perfil',
+          TextButton(
+            onPressed: () {},
+            child: Text(
+              'Ver más',
+              style: TextStyle(
+                color: scheme.primary,
+                fontSize: 14,
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildBookCard(
-    Map<String, dynamic> book,
-    ColorScheme scheme,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Imagen (SIEMPRE de red)
-        Expanded(
-          child: Stack(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: scheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
+  // CARD CON MISMO ICONO DE FAVORITOS DE HOME
+  Widget _buildBookCard(Libro libro, ColorScheme scheme) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => PaginaDetalleLibro(
+              libroId: libro.id,
+              datosLibro: {
+                'titulo': libro.titulo,
+                'autor': libro.autor,
+                'imagenUrl': libro.imagenUrl,
+                'calificacion': libro.calificacion,
+                'categorias': libro.categorias,
+                'paginas': libro.paginas,
+              },
+            ),
+          ),
+        ).then((_) => setState(() {}));
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Imagen con icono
+          Expanded(
+            child: Stack(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: scheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.network(
+                      libro.imagenUrl,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      errorBuilder: (_, __, ___) {
+                        return Container(
+                          color: scheme.surfaceContainerHighest,
+                          child: Icon(Icons.book,
+                              size: 40, color: scheme.outline),
+                        );
+                      },
                     ),
-                  ],
+                  ),
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    book['imageUrl'],
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: scheme.surfaceContainerHighest,
-                        child: Icon(
-                          Icons.book,
-                          size: 40,
-                          color: scheme.outline,
+
+                // ❤️ MISMO ICONO DE HOME.DART
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: FutureBuilder<bool>(
+                    future: _servicioFirebase.esFavorito(libro.id),
+                    builder: (context, snapshot) {
+                      final esFavorito = snapshot.data ?? false;
+
+                      return GestureDetector(
+                        onTap: () => _alternarFavorito(libro),
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.85),
+                            borderRadius: BorderRadius.circular(6),
+                            boxShadow: [
+                              BoxShadow(
+                                color:
+                                    Colors.black.withValues(alpha: 0.15),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Icon(
+                            esFavorito
+                                ? Icons.bookmark
+                                : Icons.bookmark_border,
+                            color: AppTheme.azulSecundario,
+                            size: 24,
+                          ),
                         ),
                       );
                     },
                   ),
                 ),
-              ),
-              // Marcador
-              Positioned(
-                top: 6,
-                right: 6,
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: AppTheme.azulSecundario,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Icon(
-                    Icons.bookmark,
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          book['title'].split('\n')[0],
-          style: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-          ),
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-        const SizedBox(height: 2),
-        Row(
-          children: List.generate(
-            book['rating'] as int,
-            (index) => const Icon(
-              Icons.star,
-              color: AppTheme.amarilloEstrella,
-              size: 12,
+              ],
             ),
           ),
+
+          const SizedBox(height: 6),
+
+          // Título
+          Text(
+            libro.titulo,
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+            ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+
+          const SizedBox(height: 2),
+
+          Row(
+            children: List.generate(
+              libro.calificacion.toInt(),
+              (i) => const Icon(
+                Icons.star,
+                color: AppTheme.amarilloEstrella,
+                size: 12,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  BottomNavigationBar _buildBottomBar(ColorScheme scheme) {
+    return BottomNavigationBar(
+      currentIndex: _selectedIndex,
+      onTap: _onItemTapped,
+      type: BottomNavigationBarType.fixed,
+      selectedItemColor: scheme.primary,
+      unselectedItemColor: scheme.outlineVariant,
+      items: const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home),
+          label: 'Inicio',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.search),
+          label: 'Buscar',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.book),
+          label: '',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.favorite_border),
+          label: 'Listas',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person_outline),
+          label: 'Perfil',
         ),
       ],
     );

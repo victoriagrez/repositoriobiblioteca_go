@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../theme/theme.dart'; // usa tu AppTheme y FlexColorScheme
+import '../theme/theme.dart';
+import 'buscar.dart';
+import 'listas.dart';
 
 class PerfilPage extends StatefulWidget {
   const PerfilPage({super.key});
@@ -17,6 +19,42 @@ class _PerfilPageState extends State<PerfilPage> {
   static const String _urlFotoPerfil =
       'https://firebasestorage.googleapis.com/v0/b/TU-BUCKET/o/portadas%2Fwoman.jpg?alt=media&token=...';
 
+  void _onItemTapped(int index) {
+    if (index == _selectedIndex) return;
+
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    switch (index) {
+      case 0: // Inicio
+        Navigator.pop(context);
+        break;
+      case 1: // Buscar
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const BuscarPage()),
+        );
+        break;
+      case 2: // Libros
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Lectura rápida')),
+        );
+        setState(() {
+          _selectedIndex = 4;
+        });
+        break;
+      case 3: // Listas
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const PaginaListas()),
+        );
+        break;
+      case 4: // Perfil - Ya estamos aquí
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
@@ -27,16 +65,9 @@ class _PerfilPageState extends State<PerfilPage> {
         backgroundColor: scheme.primary,
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppTheme.azulSecundario,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.person,
-              color: scheme.onPrimary,
-              size: 24,
-            ),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () => Navigator.pop(context),
           ),
         ),
         title: const Text(
@@ -64,7 +95,7 @@ class _PerfilPageState extends State<PerfilPage> {
           children: [
             const SizedBox(height: 24),
 
-            // FOTO DE PERFIL + NOMBRE
+            
             Center(
               child: Column(
                 children: [
@@ -155,7 +186,13 @@ class _PerfilPageState extends State<PerfilPage> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      // Ir a listas
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const PaginaListas()),
+                      );
+                    },
                     child: const Text(
                       'Ver Más',
                       style: TextStyle(
@@ -318,16 +355,7 @@ class _PerfilPageState extends State<PerfilPage> {
       // BOTTOM NAVIGATION
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-
-          // Aquí puedes implementar navegación real si quieres
-          if (index != 4) {
-            Navigator.pop(context);
-          }
-        },
+        onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
         selectedItemColor: AppTheme.naranjaPrimario,
         unselectedItemColor: Colors.grey,
